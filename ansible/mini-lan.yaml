@@ -1,54 +1,55 @@
 #Ansible server: 192.168.59.128
 #Need to pre-config the switches
-host: SW1
-tasks:
-- name: Send config to SW1
-  telnet:
-    user: user1
-    password: cisco
-    login_prompt: "Username: "
-    prompts:
-      - "[>|#]"
-    command:
-      - terminal length 0
-      - configure terminal
-      - hostname coreswitch1
-      - banner motd 'I was set up by the ansible host!!!!!'
+- name: Deployment of mini-Lan network 1
+  gather_facts: False
+  hosts: SW1
+  tasks:
+    - name: Send config to SW1
+      telnet:
+        user: user1
+        password: cisco
+        login_prompt: "Username: "
+        prompts:
+          - "[>|#]"
+        command:
+            - terminal length 0
+            - configure terminal
+            - hostname coreswitch1
+            - banner motd 'I was set up by the ansible host!!!!!'
 
-host: R1
-tasks:
-- name: Setting interfaces for R1
-  telnet:
-    user: user1
-    password: cisco
-    login_prompt: "Username: "
-    prompts:
-      - "[>|#]"
-    command:
-      - terminal length 0
-      - configure terminal
-      - hostname CoreRouter1
-      - banner motd 'I was set up by the ansible host!!!!!'
-      - interface fastEthernet 0/0
-      - ip address 192.168.0.1 255.255.255.0
-      - no shut
-      - end
+  hosts: R1
+  tasks:
+    - name: Setting interfaces for R1
+      telnet:
+        user: user1
+        password: cisco
+        login_prompt: "Username: "
+        prompts:
+          - "[>|#]"
+        command:
+            - terminal length 0
+            - configure terminal
+            - hostname CoreRouter1
+            - banner motd 'I was set up by the ansible host!!!!!'
+            - interface fastEthernet 0/0
+            - ip address 192.168.0.1 255.255.255.0
+            - no shut
+            - end
 
-host: R2
-tasks:
-  - name: Setting interfaces for R2
-    telnet:
-      user: user1
-      password: cisco
-      login_prompt: "Username: "
-      prompts:
-        - "[>|#]"
-      command:
-        - terminal length 0
-        - configure terminal
-        - hostname CoreRouter1
-        - banner motd 'I was set up by the ansible host!!!!!'
-        - interface fastEthernet 0/0
-        - ip address 192.168.0.2 255.255.255.0
-        - no shut
-        - end
+  hosts: R2
+  tasks:
+    - name: Setting interfaces for R2
+      telnet:
+        user: user1
+        password: cisco
+        login_prompt: "Username: "
+        prompts:
+          - "[>|#]"
+        command:
+            - terminal length 0
+            - configure terminal
+            - hostname CoreRouter1
+            - banner motd 'I was set up by the ansible host!!!!!'
+            - interface fastEthernet 0/0
+            - ip address 192.168.0.2 255.255.255.0
+            - no shut
