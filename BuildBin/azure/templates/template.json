@@ -1,0 +1,129 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "location": {
+            "type": "string",
+            "defaultValue": "uksouth"
+        },
+        "networkInterfaceName": {
+            "type": "string",
+            "defaultValue": "r1testnode707"
+        },
+        "subnetName": {
+            "type": "string",
+            "defaultValue": "Office1"
+        },
+        "virtualNetworkId": {
+            "type": "string",
+            "defaultValue": "TestNetwork"
+        },
+        "virtualMachineName": {
+            "type": "string",
+            "defaultValue": "R1TestNode"
+        },
+        "virtualMachineRG": {
+            "type": "string",
+            "defaultValue": "R1TestNode"
+        },
+        "osDiskType": {
+            "type": "string",
+            "defaultValue": "Standard_LRS"
+        },
+        "virtualMachineSize": {
+            "type": "string",
+            "defaultValue": "Standard_B1s"
+        },
+        "adminUsername": {
+            "type": "string",
+            "defaultValue": "amarriott"
+        },
+        "adminPublicKey": {
+            "type": "secureString",
+            "defaultValue": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDPkYDabqeICj4havT7F/86zbmqTWr+iJU9DAWaYLZPVzMZRY2Kp8jn8VwbaxwIyVYb0n4AMlHXzacnkbo2hwNvQanSOIeReFprg7wthWdqtGmwaqG9t/Prxy3r+rjW0TuW1FLi0QdT2TOMuhBEY+Jh4UvyrtBqM8LXZIW1flj0LgV7sDwjtIy3nZq2sZjspDc2a52b7y9whc7QrFf8i0Pop3F08pEf/qubwZ+4mMCe0wwAxHQmVFAa+2OIZlMoMiCd7iFcn/psFc9e8dQ5J7LvBsJZbYfWN6gzMl+o8+jKhJXGVn1PesnhJu9k522lynmIwI2Ogg4udWR+LGOgj0Uf alexmarriott@ALEXs-MacBook-Pro.local"
+        }
+    },
+    "variables": {
+        "vnetId": "[concat('/subscriptions/8da87477-14ec-488c-a181-1dbdcc25525e/resourceGroups/TestNetwork/providers/Microsoft.Network/virtualNetworks/', parameters('virtualNetworkId'))]",
+        "subnetRef": "[concat(variables('vnetId'), '/subnets/', parameters('subnetName'))]"
+    },
+    "resources": [
+        {
+            "name": "[parameters('networkInterfaceName')]",
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2019-07-01",
+            "location": "[parameters('location')]",
+            "dependsOn": [],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "subnet": {
+                                "id": "[variables('subnetRef')]"
+                            },
+                            "privateIPAllocationMethod": "Dynamic"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "name": "[parameters('virtualMachineName')]",
+            "type": "Microsoft.Compute/virtualMachines",
+            "apiVersion": "2019-07-01",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/networkInterfaces/', parameters('networkInterfaceName'))]"
+            ],
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "[parameters('virtualMachineSize')]"
+                },
+                "storageProfile": {
+                    "osDisk": {
+                        "createOption": "fromImage",
+                        "managedDisk": {
+                            "storageAccountType": "[parameters('osDiskType')]"
+                        }
+                    },
+                    "imageReference": {
+                        "publisher": "Canonical",
+                        "offer": "UbuntuServer",
+                        "sku": "
+                        S",
+                        "version": "latest"
+                    }
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', parameters('networkInterfaceName'))]"
+                        }
+                    ]
+                },
+                "osProfile": {
+                    "computerName": "[parameters('virtualMachineName')]",
+                    "adminUsername": "[parameters('adminUsername')]",
+                    "linuxConfiguration": {
+                        "disablePasswordAuthentication": true,
+                        "ssh": {
+                            "publicKeys": [
+                                {
+                                    "path": "[concat('/home/', parameters('adminUsername'), '/.ssh/authorized_keys')]",
+                                    "keyData": "[parameters('adminPublicKey')]"
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        }
+    ],
+    "outputs": {
+        "adminUsername": {
+            "type": "string",
+            "value": "[parameters('adminUsername')]"
+        }
+    }
+}
