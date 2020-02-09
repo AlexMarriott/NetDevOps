@@ -28,7 +28,7 @@ class AzureApiTest(unittest.TestCase):
                       {"node": "T3AinTest", "nic": 'T3AinTest03'}]
 
         for test_node in test_nodes:
-            resp = azure_api.create_node(vmname=test_node['node'], nic = test_node['nic'])
+            resp = azure_api.create_node(vmname=test_node['node'])
             print(resp)
         #self.assertEqual(resp['status_code'], 202)
         #self.clean_up()
