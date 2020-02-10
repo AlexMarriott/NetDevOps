@@ -1,5 +1,3 @@
-import json
-
 from .azure_credentials import get_credentials, get_subscription
 from azure.mgmt.resource.resources.models import DeploymentMode
 from azure.mgmt.compute import ComputeManagementClient
@@ -9,8 +7,8 @@ from azure.mgmt.resource.resources.models import DeploymentMode
 import requests
 import random
 import os
-
-
+import time
+import json
 def parameterise_values(parameters):
     return {k: {'value': v} for k, v in parameters.items()}
 
@@ -30,30 +28,40 @@ class AzureApi():
         self.nic_template = self.get_templates(os.path.abspath("BuildBin/azure/templates/create_nic.json"))
         self.rg_template = self.get_templates(os.path.abspath("BuildBin/azure/templates/create_rg.json"))
 
-    def create_node(self, vmname="R1TestNode", subnet="Office1"):
-        nic_name = vmname + str(random.randint(1, 100) * 5)
-        resource_group = vmna
+    def create_node(self, nic_name=None, vmname="R1TestNode", subnet="Office1"):
+        if nic_name is None:
+            nic_name = vmname + str(random.randint(1, 100) * 5)
+        resource_group = "{0}-rg".format(vmname)
         parameters = {'networkInterfaceName': nic_name, 'location': 'uksouth', 'subnetId': 'Office1'}
         parameters = parameterise_values(parameters)
         # Create a resource group for node
+        self.resource_client.resource_groups.create_or_update(resource_group, parameters={'location':'uksouth'})
+        # Dirtylittle fix since I need to poll thhe resource group being created.
+        time.sleep(5)
+
 
         # Create network interface card for the node
-        self.network_client.network_interfaces.create_or_update(self.resource_group, nic_name,
+        nic_deployment_async_operation = self.network_client.network_interfaces.create_or_update(resource_group, nic_name,
                                                                 self.prepare_nic_template(
+                                                                    resource_group,
                                                                     network_interface_name=parameters[
                                                                         'networkInterfaceName']))
+        nic_deployment_async_operation
 
-        deployment_async_operation = self.client.virtual_machines.create_or_update(self.resource_group, vmname,
-                                                                                   self.prepare_vm_template(nic_name, vmname))
+        deployment_async_operation = self.compute_client.virtual_machines.create_or_update(resource_group, vmname,
+                                                                                   self.prepare_vm_template(resource_group,
+                                                                                                            nic_name,
+                                                                                                            vmname))
         deployment_async_operation.wait()
 
-        print(deployment_async_operation)
+        return self.resource_client.resource_groups.get(resource_group)
 
     def get_templates(self, template):
         with open(template, 'r') as template_file_fd:
             return json.load(template_file_fd)
 
     def prepare_nic_template(self,
+                             resource_group,
                              network_interface_name='test_nice_' + str(random.randint(1, 10) * 5),
                              location="uksouth",
                              subnet="Office1",
@@ -70,7 +78,8 @@ class AzureApi():
                             "privateIpAddressVersion": "IPv4",
                             "privateIPAllocationMethod": "{0}".format(ip_assigmnet_method),
                             "subnet": {
-                                "id": "/subscriptions/8da87477-14ec-488c-a181-1dbdcc25525e/resourceGroups/TestNetwork/providers/Microsoft.Network/virtualNetworks/TestNetwork/subnets/{0}".format(
+                                "id": "/subscriptions/8da87477-14ec-488c-a181-1dbdcc25525e/resourceGroups/TestNetwork/providers/Microsoft.Network/virtualNetworks/TestNetwork/subnets/{1}".format(
+                                    resource_group,
                                     subnet)
                             }
                         }
@@ -79,7 +88,7 @@ class AzureApi():
             }
         }
 
-    def prepare_vm_template(self, nic_name, vmname='test_vm_' + str(random.randint(1, 10) * 5)):
+    def prepare_vm_template(self, resource_group, nic_name, vmname='test_vm_' + str(random.randint(1, 10) * 5)):
         # Nic must have a value.
         if nic_name is None or "":
             return False
@@ -113,7 +122,7 @@ class AzureApi():
             "networkProfile": {
                 "networkInterfaces": [
                     {
-                        "id": "[resourceId('Microsoft.Network/networkInterfaces/{0}".format(nic_name),
+                        "id": "/subscriptions/8da87477-14ec-488c-a181-1dbdcc25525e/resourceGroups/{0}/providers/Microsoft.Network/networkInterfaces/{1}".format(resource_group,nic_name),
                         "properties": {
                             "primary": "true"
                         }
