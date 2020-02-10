@@ -15,7 +15,7 @@ credentials = ServicePrincipalCredentials(
     tenant = TENANT_ID
 )
 
-subscription_id = ''
+subscription_id = '8da87477-14ec-488c-a181-1dbdcc25525e'
 
 def get_credentials():
     return credentials
