@@ -3,12 +3,13 @@ from azure.mgmt.resource.resources.models import DeploymentMode
 from azure.mgmt.compute import ComputeManagementClient
 from azure.mgmt.network import NetworkManagementClient
 from azure.mgmt.resource import ResourceManagementClient
-from azure.mgmt.resource.resources.models import DeploymentMode
+from msrestazure.azure_exceptions import CloudError
 import requests
 import random
 import os
 import time
 import json
+
 
 def parameterise_values(parameters):
     return {k: {'value': v} for k, v in parameters.items()}
@@ -29,45 +30,63 @@ class AzureApi():
         self.nic_template = self.get_templates(os.path.abspath("BuildBin/azure/templates/create_nic.json"))
         self.rg_template = self.get_templates(os.path.abspath("BuildBin/azure/templates/create_rg.json"))
 
-    def create_node(self, nic_name=None, vmname="R1TestNode", subnet="Office1"):
+    def create_node(self, vmname="R1TestNode",nic_name=None,  subnet="Office1"):
         if nic_name is None:
             nic_name = vmname + str(random.randint(1, 100) * 5)
-        resource_group = "{0}-rg".format(vmname)
         parameters = {'networkInterfaceName': nic_name, 'location': 'uksouth', 'subnetId': 'Office1'}
         parameters = parameterise_values(parameters)
-        # Create a resource group for node
-        self.resource_client.resource_groups.create_or_update(resource_group, parameters={'location':'uksouth'})
-        # Dirtylittle fix since I need to poll the resource group being created.
-        # TODO add polling in here.
-        time.sleep(5)
-
 
         # Create network interface card for the node
-        nic_deployment_async_operation = self.network_client.network_interfaces.create_or_update(resource_group, nic_name,
-                                                                self.prepare_nic_template(
-                                                                    resource_group,
-                                                                    network_interface_name=parameters[
-                                                                        'networkInterfaceName']))
-        nic_deployment_async_operation
+        nic_deployment_async_operation = self.network_client.network_interfaces.create_or_update(self.resource_group,
+                                                                                                 nic_name,
+                                                                                                 self.prepare_nic_template(
+                                                                                                     self.resource_group,
+                                                                                                     network_interface_name=
+                                                                                                     parameters[
+                                                                                                         'networkInterfaceName']))
+        nic_deployment_async_operation.wait()
 
-        deployment_async_operation = self.compute_client.virtual_machines.create_or_update(resource_group, vmname,
-                                                                                   self.prepare_vm_template(resource_group,
-                                                                                                            nic_name,
-                                                                                                            vmname))
+        deployment_async_operation = self.compute_client.virtual_machines.create_or_update(self.resource_group, vmname,
+                                                                                           self.prepare_vm_template(
+                                                                                               self.resource_group,
+                                                                                               nic_name,
+                                                                                               vmname))
         deployment_async_operation.wait()
+        vm = self.compute_client.virtual_machines.get(self.resource_group, vmname)
+        nic_ip = self.network_client.network_interfaces.get(self.resource_group,nic_name)
+        disk_name = vm.storage_profile.os_disk.name
 
-        return self.compute_client.virtual_machines.get(resource_group, vmname)
+        return {"vm": vm,
+                "resource_group": self.resource_group,
+                "nic_name":nic_name,
+                "nic_ip":nic_ip.ip_configurations[0].private_ip_address,
+                "disk_name": disk_name}
 
-    def list_nodes(self):
-        pass
-    def get_resource_groups(self, nics= []):
-        pass
-    def get_node(self, resource_group, vmname, expand=""):
-        return self.compute_client.virtual_machines.get(resource_group, vmname, paramaters={"$expand={0}".format(expand)})
+    def get_node(self, vmname, expand=""):
+        return self.compute_client.virtual_machines.get(self.resource_group, vmname,
+                                                        paramaters={"$expand={0}".format(expand)})
 
     def delete_node(self, node):
-        self.resource_client.resource_groups
-        self.resource_client.resource_groups.get()
+        try:
+            async_delete = self.compute_client.virtual_machines.delete(self.resource_group, node.name)
+            async_delete.wait(timeout=10)
+            print(async_delete.done())
+
+
+            async_nic_delete = self.network_client.network_interfaces.delete(self.resource_group, node.nic_name)
+            async_nic_delete.wait(timeout=5)
+            print(async_nic_delete.done())
+
+            async_disk_delete = self.compute_client.disks.delete(self.resource_group, node.disk_name)
+            async_disk_delete.wait(timeout=5)
+            print(async_disk_delete.done())
+
+        except CloudError as e:
+            print(e)
+            return 404
+        return 404
+
+
     def get_templates(self, template):
         with open(template, 'r') as template_file_fd:
             return json.load(template_file_fd)
@@ -134,7 +153,8 @@ class AzureApi():
             "networkProfile": {
                 "networkInterfaces": [
                     {
-                        "id": "/subscriptions/8da87477-14ec-488c-a181-1dbdcc25525e/resourceGroups/{0}/providers/Microsoft.Network/networkInterfaces/{1}".format(resource_group,nic_name),
+                        "id": "/subscriptions/8da87477-14ec-488c-a181-1dbdcc25525e/resourceGroups/{0}/providers/Microsoft.Network/networkInterfaces/{1}".format(
+                            resource_group, nic_name),
                         "properties": {
                             "primary": "true"
                         }
@@ -142,3 +162,16 @@ class AzureApi():
                 ]
             }
         }
+
+
+    def list_nodes(self):
+        pass
+
+
+    def get_resource_group(self, nic=None, node=None):
+        if nic is not None:
+            pass
+        elif node is not None:
+            pass
+        else:
+            return False
