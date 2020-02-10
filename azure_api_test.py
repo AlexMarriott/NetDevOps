@@ -1,6 +1,7 @@
-import unittest
-from BuildBin.azure.azure_api import AzureApi
 
+from BuildBin.azure.azure_api import AzureApi
+import unittest
+import json
 
 class AzureApiTest(unittest.TestCase):
 
@@ -27,8 +28,9 @@ class AzureApiTest(unittest.TestCase):
                       {"node": "T2AinTest", "nic": 'T2AinTest02'},
                       {"node": "T3AinTest", "nic": 'T3AinTest03'}]
 
-        for test_node in test_nodes:
-            resp = azure_api.create_node(vmname=test_node['node'])
-            print(resp)
+        #resp = azure_api.create_node(vmname="T1AinTest")
+        resp = azure_api.get_node("T1AinTest-rg", "T1AinTest")
+
+        resp.network_profile.network_interfaces[0].id
         #self.assertEqual(resp['status_code'], 202)
         #self.clean_up()

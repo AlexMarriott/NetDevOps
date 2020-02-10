@@ -9,6 +9,7 @@ import random
 import os
 import time
 import json
+
 def parameterise_values(parameters):
     return {k: {'value': v} for k, v in parameters.items()}
 
@@ -36,7 +37,8 @@ class AzureApi():
         parameters = parameterise_values(parameters)
         # Create a resource group for node
         self.resource_client.resource_groups.create_or_update(resource_group, parameters={'location':'uksouth'})
-        # Dirtylittle fix since I need to poll thhe resource group being created.
+        # Dirtylittle fix since I need to poll the resource group being created.
+        # TODO add polling in here.
         time.sleep(5)
 
 
@@ -54,8 +56,18 @@ class AzureApi():
                                                                                                             vmname))
         deployment_async_operation.wait()
 
-        return self.resource_client.resource_groups.get(resource_group)
+        return self.compute_client.virtual_machines.get(resource_group, vmname)
 
+    def list_nodes(self):
+        pass
+    def get_resource_groups(self, nics= []):
+        pass
+    def get_node(self, resource_group, vmname, expand=""):
+        return self.compute_client.virtual_machines.get(resource_group, vmname, paramaters={"$expand={0}".format(expand)})
+
+    def delete_node(self, node):
+        self.resource_client.resource_groups
+        self.resource_client.resource_groups.get()
     def get_templates(self, template):
         with open(template, 'r') as template_file_fd:
             return json.load(template_file_fd)
