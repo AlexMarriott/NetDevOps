@@ -70,5 +70,5 @@ class AzureApiTest(unittest.TestCase):
                                                disk_name=vm['disk_name']))
         
         for node in test_node_objects:
-            async_delete = azure_api.delete_node(node)
-            async_delete.wait()
+            print("deleteing: {0}".format(node))
+            azure_api.delete_node(node)

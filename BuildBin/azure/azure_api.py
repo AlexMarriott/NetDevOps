@@ -37,6 +37,7 @@ class AzureApi():
         parameters = parameterise_values(parameters)
 
         # Create network interface card for the node
+        print("Creating:{0}".format(nic_name))
         nic_deployment_async_operation = self.network_client.network_interfaces.create_or_update(self.resource_group,
                                                                                                  nic_name,
                                                                                                  self.prepare_nic_template(
@@ -46,6 +47,7 @@ class AzureApi():
                                                                                                          'networkInterfaceName']))
         nic_deployment_async_operation.wait()
 
+        print("Creating:{0}".format(vmname))
         deployment_async_operation = self.compute_client.virtual_machines.create_or_update(self.resource_group, vmname,
                                                                                            self.prepare_vm_template(
                                                                                                self.resource_group,
@@ -68,18 +70,22 @@ class AzureApi():
 
     def delete_node(self, node):
         try:
+            print("deleting:{0}".format(node.name))
             async_delete = self.compute_client.virtual_machines.delete(self.resource_group, node.name)
-            async_delete.wait(timeout=10)
-            print(async_delete.done())
+            async_delete.wait()
+            print(async_delete.status())
 
 
             async_nic_delete = self.network_client.network_interfaces.delete(self.resource_group, node.nic_name)
-            async_nic_delete.wait(timeout=5)
-            print(async_nic_delete.done())
+            print("deleting:{0}".format(node.nic_name))
+
+            async_nic_delete.wait()
+            print(async_nic_delete.status())
 
             async_disk_delete = self.compute_client.disks.delete(self.resource_group, node.disk_name)
-            async_disk_delete.wait(timeout=5)
-            print(async_disk_delete.done())
+            print("deleting:{0}".format(node.disk_name))
+            async_disk_delete.wait()
+            print(async_disk_delete.status())
 
         except CloudError as e:
             print(e)
