@@ -33,7 +33,7 @@ class AzureApi():
     def create_node(self, vmname="R1TestNode",nic_name=None,  subnet="Office1"):
         if nic_name is None:
             nic_name = vmname + str(random.randint(1, 100) * 5)
-        parameters = {'networkInterfaceName': nic_name, 'location': 'uksouth', 'subnetId': 'Office1'}
+        parameters = {'networkInterfaceName': nic_name, 'location': 'uksouth', 'subnetId': subnet}
         parameters = parameterise_values(parameters)
 
         # Create network interface card for the node
@@ -86,6 +86,8 @@ class AzureApi():
             print("deleting:{0}".format(node.disk_name))
             async_disk_delete.wait()
             print(async_disk_delete.status())
+
+            return async_delete.status()
 
         except CloudError as e:
             print(e)
@@ -168,16 +170,3 @@ class AzureApi():
                 ]
             }
         }
-
-
-    def list_nodes(self):
-        pass
-
-
-    def get_resource_group(self, nic=None, node=None):
-        if nic is not None:
-            pass
-        elif node is not None:
-            pass
-        else:
-            return False
