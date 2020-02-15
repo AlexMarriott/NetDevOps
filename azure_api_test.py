@@ -1,5 +1,7 @@
-import unittest
 from BuildBin.azure.azure_api import AzureApi
+from BuildBin.azure.models import AzureNode
+import unittest
+import json
 
 
 class AzureApiTest(unittest.TestCase):
@@ -13,22 +15,63 @@ class AzureApiTest(unittest.TestCase):
         return nodes
 
     @staticmethod
-    def clean_up():
+    def clean_up(nodes):
         azure_api = AzureApi()
-        nodes = azure_api.list_droplets()
-        for i in nodes:
-            print("Deleting nodes:{0}".format(i['name']))
-            print("Respones: {0}".format(azure_api.delete_droplet(i['id'])))
+        for node in nodes:
+            if isinstance(nodes, dict):
+                node = AzureNode(name=node['node'],
+                                 resource_group="test",
+                                 nic_name=node['nic'],
+                                 nic_ip='192.168.1.1',
+                                 disk_name=node['disk'])
+
+            print("deleteing: {0}".format(node))
+            azure_api.delete_node(node)
 
     def test_create_node(self):
         print("Running create azure node test")
         azure_api = AzureApi()
-        test_nodes = [{"node": "T1AinTest", "nic": 'T1AinTest01'},
-                      {"node": "T2AinTest", "nic": 'T2AinTest02'},
-                      {"node": "T3AinTest", "nic": 'T3AinTest03'}]
+        test_nodes = [{"node": "T1AinTest", "nic": 'T1AinTest01', "disk": "T1AinTest01Disk123"},
+                      {"node": "T2AinTest", "nic": 'T2AinTest02', "disk": "T1AinTest01Disk123"},
+                      {"node": "T3AinTest", "nic": 'T3AinTest03', "disk": "T1AinTest01Disk123"}]
+        test_node_objects = []
+        for node in test_nodes:
+            vm = azure_api.create_node(vmname=node['node'], nic_name=node['nic'])
 
-        for test_node in test_nodes:
-            resp = azure_api.create_node(vmname=test_node['node'])
-            print(resp)
-        #self.assertEqual(resp['status_code'], 202)
-        #self.clean_up()
+            test_node_objects.append(AzureNode(name=vm['vm'].name,
+                                               resource_group=vm['resource_group'],
+                                               nic_name=vm['nic_name'],
+                                               nic_ip=vm['nic_ip'],
+                                               disk_name=vm['disk_name']))
+        try:
+            self.assertEqual(test_node_objects[0].name, test_nodes[0]['node'])
+            self.assertEqual(test_node_objects[0].name, test_nodes[0]['nic'])
+            self.assertEqual(test_node_objects[0].name, test_nodes[0]['disk'])
+            self.clean_up(test_node_objects)
+        except AssertionError as e:
+            print(e)
+            self.clean_up(test_nodes)
+
+    def test_get_network_nodes(self):
+        pass
+
+    def test_delete_node(self):
+        azure_api = AzureApi()
+
+        test_nodes = [{"node": "T1AinTest", "nic": 'T1AinTest01', "disk": "T1AinTest01Disk123"},
+                      {"node": "T2AinTest", "nic": 'T2AinTest02', "disk": "T1AinTest01Disk123"},
+                      {"node": "T3AinTest", "nic": 'T3AinTest03', "disk": "T1AinTest01Disk123"}]
+        test_node_objects = []
+        for node in test_nodes:
+            vm = azure_api.create_node(vmname=node['node'], nic_name=node['nic'])
+
+            test_node_objects.append(AzureNode(name=vm['vm'].name,
+                                               resource_group=vm['resource_group'],
+                                               nic_name=vm['nic_name'],
+                                               nic_ip=vm['nic_ip'],
+                                               disk_name=vm['disk_name']))
+
+        for node in test_node_objects:
+            print("deleting: {0}".format(node))
+            azure_api.delete_node(node)
+            self.assertEquals(azure_api.delete_node(node), "succeeded")

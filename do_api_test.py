@@ -1,5 +1,5 @@
 import unittest
-from BuildBin.do_api import DoApi
+from .BuildBin.do_api import DoApi
 
 
 class Do_Api_Test(unittest.TestCase):
@@ -27,7 +27,7 @@ class Do_Api_Test(unittest.TestCase):
         resp = do_api.create_droplets(names=names)
         self.assertEqual(resp['status_code'], 202)
         self.clean_up()
-        
+
     def test_list_droplets(self):
         print("Running list droplet test")
         nodes = self.setup()
@@ -42,4 +42,3 @@ class Do_Api_Test(unittest.TestCase):
             resp = do_api.delete_droplet(node['id'])
             self.assertEqual(resp['status_code'], 204)
         self.clean_up()
-

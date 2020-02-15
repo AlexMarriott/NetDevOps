@@ -12,10 +12,10 @@
         prompts:
           - "[>|#]"
         command:
-            - terminal length 0
-            - configure terminal
-            - hostname coreswitch1
-            - banner motd 'I was set up by the ansible host!!!!!'
+          - terminal length 0
+          - configure terminal
+          - hostname coreswitch1
+          - banner motd 'I was set up by the ansible host!!!!!'
 
   hosts: R1
   tasks:
@@ -27,14 +27,14 @@
         prompts:
           - "[>|#]"
         command:
-            - terminal length 0
-            - configure terminal
-            - hostname CoreRouter1
-            - banner motd 'I was set up by the ansible host!!!!!'
-            - interface fastEthernet 0/0
-            - ip address 192.168.0.1 255.255.255.0
-            - no shut
-            - end
+          - terminal length 0
+          - configure terminal
+          - hostname CoreRouter1
+          - banner motd 'I was set up by the ansible host!!!!!'
+          - interface fastEthernet 0/0
+          - ip address 192.168.0.1 255.255.255.0
+          - no shut
+          - end
 
   hosts: R2
   tasks:
@@ -46,10 +46,10 @@
         prompts:
           - "[>|#]"
         command:
-            - terminal length 0
-            - configure terminal
-            - hostname CoreRouter1
-            - banner motd 'I was set up by the ansible host!!!!!'
-            - interface fastEthernet 0/0
-            - ip address 192.168.0.2 255.255.255.0
-            - no shut
+          - terminal length 0
+          - configure terminal
+          - hostname CoreRouter1
+          - banner motd 'I was set up by the ansible host!!!!!'
+          - interface fastEthernet 0/0
+          - ip address 192.168.0.2 255.255.255.0
+          - no shut

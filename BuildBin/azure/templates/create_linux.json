@@ -1,0 +1,38 @@
+{
+  "location": "uksouth",
+    "hardwareProfile": {
+      "vmSize": "Standard_B1s"
+    },
+    "storageProfile": {
+      "imageReference": {
+        "sku": "18.04-LTS",
+        "publisher": "Canonical",
+        "version": "latest",
+        "offer": "UbuntuServer"
+      }
+      },
+      "osDisk": {
+        "caching": "ReadWrite",
+        "managedDisk": {
+          "storageAccountType": "Standard_LRS"
+        },
+        "name": "myVMosdisk",
+        "createOption": "FromImage"
+      },
+
+    "osProfile": {
+      "adminUsername": "amarriott",
+      "computerName": "[parameters('VMNAME')]",
+      "adminPassword": "Movingonup2016"
+    },
+    "networkProfile": {
+      "networkInterfaces": [
+        {
+          "id": "[resourceId('Microsoft.Network/networkInterfaces', parameters('networkInterfaceName'))]",
+          "properties": {
+            "primary": "true"
+          }
+        }
+      ]
+    }
+  }
