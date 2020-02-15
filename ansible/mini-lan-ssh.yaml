@@ -6,11 +6,6 @@
   hosts: R1
   gather_facts: no
   connection: local
-  vars:
-    cli:
-      username: Cisco
-      password: Cisco
-
   tasks:
 
 #  - name: setting up the interfaces for R1
@@ -28,9 +23,7 @@
     ios_banner:
       banner: login
       text: |
-        this is my login banner
-        , this was done by ansible
-        for R1..
+        This is a login in Banner made by ansible for R1
       provider:
         auth_pass: Cisco
         authorize: yes
@@ -38,8 +31,10 @@
         password: Cisco
         host: 10.16.17.2
 
-#- hosts: R2
-#  tasks:
+- hosts: R2
+  gather_facts: no
+  connection: local
+  tasks:
 #  - name: Setting up the interfaces for R2
 #    ios_13_interfaces:
 #      config:
@@ -51,23 +46,32 @@
 #        - address: 192.168.20.2/24
 #      state: replaced
 #
-#  - name: configure the login banner
-#    ios_banner:
-#      banner: login
-#      text: |
-#        this is my login banner
-#        this was done by ansible
-#        node for R2.
-#      state: present
-#
-#- hosts: SW1
-#  tasks:
-#  - name: configure the login banner
-#    ios_banner:
-#      banner: login
-#      text: |
-#        this is my login banner
-#        , this was done by ansible
-#        node for R2.
-#      state: present
+  - name: configure the login banner
+    ios_banner:
+      banner: login
+      text: |
+        This is a login in Banner made by ansible for R2
+      provider:
+        auth_pass: Cisco
+        authorize: yes
+        username: Cisco
+        password: Cisco
+        host: 10.16.17.1
 
+
+
+- hosts: SW1
+  gather_facts: no
+  connection: local
+  tasks:
+  - name: configure the login banner
+    ios_banner:
+      banner: login
+      text: |
+        This is a login in Banner made by ansible for SW1
+      provider:
+        auth_pass: Cisco
+        authorize: yes
+        username: Cisco
+        password: Cisco
+        host: 10.16.17.3    
