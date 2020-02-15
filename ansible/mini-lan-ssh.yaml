@@ -1,23 +1,61 @@
 #Ansible server: 192.168.59.128
 #Need to pre-config the switches
 - name: Deployment of mini-Lan network 1
-  gather_facts: False
+  gather_facts: True
   hosts: R1
-  tasks:
-    - name: Send config to R1
-      ios_config:
-        lines:
-          - ip address 192.168.10.1 255.255.255.0
-          - no shut
-        parents: interface GigabitEthernet 0/0
+    tasks:
+      - name: Setting up the interfaces for R1
+          ios_13_interfaces:
+            config:
+                - name: GigabitEthernet0/0
+                  ipv4:
+                    - address: 192.168.10.1/24
+                  - name: GigabitEthernet0/1
+                    ipv4:
+                      - address: 192.168.20.1/24
+            state: replaced
 
-
-  hosts: R1
-  tasks:
-    - name: Setting interfaces for R1
-
+          - name: configure the login banner
+            ios_banner:
+              banner: login
+              text: |
+                this is my login banner
+                , this was done by ansible
+                for R1..
+              state: present
 
 
   hosts: R2
+    tasks:
+      - name: Setting up the interfaces for R2
+        ios_13_interfaces:
+          config:
+            - name: GigabitEthernet0/0
+              ipv4:
+                - address: 192.168.10.2/24
+                - name: GigabitEthernet0/1
+                  ipv4:
+                    - address: 192.168.20.2/24
+              state: replaced
+
+                - name: configure the login banner
+                  ios_banner:
+                    banner: login
+                    text: |
+                      this is my login banner
+                      , this was done by ansible
+                      node for R2.
+                    state: present
+
+
+
+  hosts: SW1
   tasks:
-    - name: Setting interfaces for R2
+    - name: configure the login banner
+        ios_banner:
+          banner: login
+          text: |
+            this is my login banner
+            , this was done by ansible
+            node for R2.
+          state: present
