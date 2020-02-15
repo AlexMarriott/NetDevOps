@@ -1,6 +1,13 @@
 #Ansible server: 192.168.59.128
 #Need to pre-config the switches
 ---
+ansible_connection: network_cli
+ansible_network_os: ios
+ansible_user: Cisco
+ansible_password: Cisco
+ansible_become: yes
+ansible_become_method: enable
+ansible_become_password: Cisco
 
 - name: configurating the cisco devices
   hosts: R1
