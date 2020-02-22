@@ -1,0 +1,49 @@
+gns3_server: "192.168.10.129"
+gns3_port: "3080"
+
+project_name: "CD-CI-Network"
+
+nodes:
+  - dynamips_name: "c7200.image"
+    name: "R1"
+    image: "c7200.image"
+    platform: "c7200"
+    ram: 512
+    "nvram": 512
+    idlepc: "0x606df838"
+    slot0: "C7200-IO-FE"
+    slot1: ""
+    #instances:
+    x: 0
+    y: 0
+    ip: "192.168.1.13 255.255.255.0"
+
+  - dynamips_name: "c3745.image"
+    name: "ESW1"
+    image: "c3745.image"
+    platform: "c3745"
+    ram: 192
+    "nvram": 256
+    idlepc: "0x60a80f7c"
+    slot0: "GT96100-FE"
+    slot1: "NM-16ESW"
+    #instances:
+    x: 0
+    y: -170
+
+links:
+  -
+    - name: "Ethernetswitch-1"
+      interface: 1
+    - name: "CiscoNX-OSv90007.0.3.I7.3-1"
+      interface: 0
+  -
+    - name: "Ethernetswitch-1"
+      interface: 2
+    - name: "CiscoNX-OSv90007.0.3.I7.3-2"
+      interface: 0
+  -
+    - name: "Ethernetswitch-1"
+      interface: 3
+    - name: "CiscoCSR1000v16.7.1-1"
+      interface: 0
