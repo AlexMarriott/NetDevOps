@@ -1,4 +1,4 @@
-from gns3.deplyoment import create_project
+from gns3.deplyoment_copy import create_project
 import requests
 import json
 import yaml
