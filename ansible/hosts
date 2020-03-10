@@ -1,6 +1,6 @@
 [R1]
-192.168.12.1
+192.168.12.1 ansible_ssh_common_args='-o HostKeyAlgorithms=ssh-rsa -o KexAlgorithms=diffie-hellman-group1-sha1 -o Ciphers=aes256-cbc,6-cbc,3des-cbc -o MACs=hmac-md5,hmac-sha2-512'
 [R2]
-192.168.12.2
+192.168.12.2 ansible_ssh_common_args='-o HostKeyAlgorithms=ssh-rsa -o KexAlgorithms=diffie-hellman-group1-sha1 -o Ciphers=aes256-cbc,6-cbc,3des-cbc -o MACs=hmac-md5,hmac-sha2-512'
 [ansible-server]
 192.168.1.131
