@@ -16,7 +16,7 @@
         authorize: yes
         username: Cisco
         password: Cisco
-        host: 192.168.12.1
+        host: 192.168.11.1
 
 - hosts: R2
   gather_facts: no
@@ -32,4 +32,20 @@
         authorize: yes
         username: Cisco
         password: Cisco
-        host: 192.168.12.2
+        host: 192.168.13.1
+
+- hosts: R3
+  gather_facts: no
+  connection: local
+  tasks:
+  - name: configure the login banner
+    ios_banner:
+      banner: login
+      text: |
+        This is a login in Banner made by ansible for R2
+      provider:
+        auth_pass: Cisco
+        authorize: yes
+        username: Cisco
+        password: Cisco
+        host: 192.168.12.3
