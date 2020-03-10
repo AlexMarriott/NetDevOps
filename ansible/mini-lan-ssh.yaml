@@ -1,4 +1,4 @@
-#Ansible server: 192.168.59.128
+#Ansible server: 192.168.1.131
 #Need to pre-config the switches
 ---
 - name: configurating the cisco devices
@@ -6,18 +6,6 @@
   gather_facts: no
   connection: local
   tasks:
-
-#  - name: setting up the interfaces for R1
-#    ios_13_interfaces:
-#      config:
-#        - name: GigabitEthernet0/0
-#          ipv4:
-#          - address: 192.168.10.1/24
-#        - name: GigabitEthernet0/1
-#          ipv4:
-#          - address: 192.168.20.1/24
-#      state: replaced
-
   - name: configure the login banner
     ios_banner:
       banner: login
@@ -28,23 +16,12 @@
         authorize: yes
         username: Cisco
         password: Cisco
-        host: 10.16.17.2
+        host: 192.168.12.1
 
 - hosts: R2
   gather_facts: no
   connection: local
   tasks:
-#  - name: Setting up the interfaces for R2
-#    ios_13_interfaces:
-#      config:
-#      - name: GigabitEthernet0/0
-#        ipv4:
-#        - address: 192.168.10.2/24
-#      - name: GigabitEthernet0/1
-#        ipv4:
-#        - address: 192.168.20.2/24
-#      state: replaced
-#
   - name: configure the login banner
     ios_banner:
       banner: login
@@ -55,22 +32,4 @@
         authorize: yes
         username: Cisco
         password: Cisco
-        host: 10.16.17.1
-
-
-
-- hosts: SW1
-  gather_facts: no
-  connection: local
-  tasks:
-  - name: configure the login banner
-    ios_banner:
-      banner: login
-      text: |
-        This is a login in Banner made by ansible for SW1
-      provider:
-        auth_pass: Cisco
-        authorize: yes
-        username: Cisco
-        password: Cisco
-        host: 10.16.17.3    
+        host: 192.168.12.2
