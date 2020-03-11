@@ -3,4 +3,3 @@ azure.mgmt.resource
 azure.mgmt.network
 pyyaml
 requests
-ansible

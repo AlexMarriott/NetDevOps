@@ -1,16 +1,14 @@
-from ansible.inventory.manager import InventoryManager
-from ansible.playbook.play import Play
-from ansible import context
-from sys import argv
-
+import pprint
+import sys
 from collections import namedtuple
 
 import requests
 import json
 import yaml
 import os
+import subprocess
 
-build_type = argv[1]
+build_type = sys.argv[1]
 gns3_server = "192.168.59.130"
 gns3_port = "3080"
 
@@ -65,21 +63,37 @@ class GNS3:
         print("Project id not found, make sure the project is loaded into GNS3")
         exit(0)
 
+class BuildAnsible():
+    def __init__(self, host_file, ):
+        self.host_file = host_file
+
+    def run_script(self, script_name, parameters=None):
+        ansible_path = "{0}\\ansible\\".format(os.getcwd())
+        #https://stackoverflow.com/questions/57763068/how-to-run-ansible-playbooks-with-subprocess
+        cmd = ["ansible-playbook",
+               "-i {0}{1},".format(ansible_path, self.host_file),
+               #"-e ansible_user={}".format('ansible'),
+               "-e ANSIBLE_HOST_KEY_CHECKING=False",
+               "{0}{1}.yaml".format(ansible_path,script_name),
+               "-v"]
+
+        proc = subprocess.Popen(cmd,
+                                stdin=subprocess.PIPE,
+                                stdout=subprocess.PIPE,
+                                ).wait()
+
+        try:
+            outs, errs = proc.communicate(timeout=15)
+            pprint.pprint(outs.decode().split('\n'))
+        except subprocess.SubprocessError as errs:
+            proc.kill()
+            sys.exit("Error: {}".format(errs))
 
 print("Starting Build process")
 
 print("Checking build type")
 
 
-class BuildAnsible():
-    def __init__(self, host_file, ):
-        self.variable_manager = VariableManager()
-        self.loader = DataLoader()
-        self.Options = namedtuple('Options', ['listtags', 'listtasks', 'listhosts', 'syntax', 'connection','module_path', 'forks', 'remote_user', 'private_key_file', 'ssh_common_args', 'ssh_extra_args', 'sftp_extra_args', 'scp_extra_args', 'become', 'become_method', 'become_user', 'verbosity', 'check'])()
-        self.host_file = host_file
-        self.inventory = Inventory(loader=self.loader,
-                                   variable_manager=self.variable_manager,
-                                   host_list=self.host_file)
 
 
 if build_type.upper() == 'LAN':
@@ -93,7 +107,11 @@ if build_type.upper() == 'LAN':
 
     print("Running ansible_files scripts")
 
-    ansible = BuildAnsible()
+    ansible = BuildAnsible("hosts")
+
+    print("Running the deployment scripts")
+
+    ansible.run_script("mini-lan-ssh")
 
     pass
 elif build_type.upper() == 'CLOUD':

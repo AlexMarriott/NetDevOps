@@ -1,8 +1,0 @@
-- name: Deplyoing to remote ansible_files server
-  hosts: ansible_files-server
-  gather_facts: yes
-  connection: local
-
-  tasks:
-    - name: Run the deployment scripts for the test network.
-      script: /mini-lan-ssh.yaml
