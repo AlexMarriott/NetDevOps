@@ -1,0 +1,12 @@
+#Ansible server: 192.168.1.131
+#Need to pre-config the switches
+---
+- name: Deploying base scripts to remote nodes
+  hosts: testnode
+  gather_facts: no
+  connection: local
+  tasks:
+  - name: Running the base testcases for the network
+    script: /some/local/script.py
+    args:
+      executable: python3

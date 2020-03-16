@@ -67,14 +67,14 @@ class BuildAnsible():
     def __init__(self, host_file, ):
         self.host_file = host_file
 
-    def run_script(self, script_name, parameters=None):
+    def run_script(self, script_name, parameters=""):
         ansible_path = "{0}\\ansible\\".format(os.getcwd())
         #https://stackoverflow.com/questions/57763068/how-to-run-ansible-playbooks-with-subprocess
         cmd = ["ansible-playbook",
                "-i {0}{1},".format(ansible_path, self.host_file),
                #"-e ansible_user={}".format('ansible'),
                "-e ANSIBLE_HOST_KEY_CHECKING=False",
-               "{0}{1}.yaml".format(ansible_path,script_name),
+               "{0}{1}.yaml {2}".format(ansible_path, script_name, parameters),
                "-v"]
 
         proc = subprocess.Popen(cmd,
@@ -93,9 +93,6 @@ print("Starting Build process")
 
 print("Checking build type")
 
-
-
-
 if build_type.upper() == 'LAN':
     print("Running Lan network deployment")
     print("Opening GNS3 Lab and powering on nodes")
@@ -105,19 +102,18 @@ if build_type.upper() == 'LAN':
     print(g.open_project(id))
     print(g.start_nodes(id))
 
-    print("Running ansible_files scripts")
-
     ansible = BuildAnsible("hosts")
 
     print("Running the deployment scripts")
 
     ansible.run_script("mini-lan-ssh")
 
+    print("Running base test case")
+    base_test = "{0}\\testcases\\{1}".format(os.getcwd(), "connectivity_check.py")
+    ansible.run_script("base-test", parameters=base_test)
+
     #This part will be running pyATS to test the topology of the new network.
     print("Running the python network tests")
-
-    
-
     pass
 elif build_type.upper() == 'CLOUD':
     print("Running Cloud network deployment")
