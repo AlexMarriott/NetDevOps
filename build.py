@@ -113,6 +113,11 @@ if build_type.upper() == 'LAN':
 
     ansible.run_script("mini-lan-ssh")
 
+    #This part will be running pyATS to test the topology of the new network.
+    print("Running the python network tests")
+
+    
+
     pass
 elif build_type.upper() == 'CLOUD':
     print("Running Cloud network deployment")
