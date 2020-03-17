@@ -68,7 +68,7 @@ class BuildAnsible():
         self.host_file = host_file
 
     def run_script(self, script_name, parameters=None):
-        ansible_path = "{0}\\ansible\\".format(os.getcwd())
+        ansible_path = "{0}/ansible_files/".format(os.getcwd())
         #https://stackoverflow.com/questions/57763068/how-to-run-ansible-playbooks-with-subprocess
         if parameters is not None:
             new_parameters = "{0}{1}.yaml --extra-vars {0}".format(ansible_path, script_name, parameters)
@@ -79,7 +79,7 @@ class BuildAnsible():
                #"-e ansible_user={}".format('ansible'),
                "-e ANSIBLE_HOST_KEY_CHECKING=False",
                 new_parameters,
-               "-v"]
+               "-vvvv"]
 
         proc = subprocess.Popen(cmd,
                                 stdin=subprocess.PIPE,
@@ -114,7 +114,7 @@ if build_type.upper() == 'LAN':
 
     print("Running base test case")
     base_test = {"hosts": "deployerserver",
-                 "script": "{0}\\testcases\\{1} --ips 192.168.12.1 192.168.12.2 192.168.12.3".format(os.getcwd(), "connectivity_check.py")}
+                 "script": "{0}/testcases/{1} --ips 192.168.12.1 192.168.12.2 192.168.12.3".format(os.getcwd(), "connectivity_check.py")}
 
     ansible.run_script("base-test", parameters=base_test)
 
