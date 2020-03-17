@@ -7,6 +7,6 @@
   connection: local
   tasks:
   - name: Running the base testcases for the network
-    script: /some/local/script.py
+    script: ../testcases/connectivity_check.py -ips {{ ips }}
     args:
       executable: python3
