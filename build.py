@@ -71,14 +71,14 @@ class BuildAnsible():
         ansible_path = "{0}\\ansible\\".format(os.getcwd())
         #https://stackoverflow.com/questions/57763068/how-to-run-ansible-playbooks-with-subprocess
         if parameters is not None:
-            new_parameters = "--extra-vars {0}".format(parameters)
+            new_parameters = "{0}{1}.yaml --extra-vars {0}".format(ansible_path, script_name, parameters)
         else:
-            new_parameters = ""
+            new_parameters = "{0}{1}.yaml".format(ansible_path, script_name)
         cmd = ["ansible-playbook",
                "-i {0}{1},".format(ansible_path, self.host_file),
                #"-e ansible_user={}".format('ansible'),
                "-e ANSIBLE_HOST_KEY_CHECKING=False",
-                "{0}{1}.yaml {2}".format(ansible_path, script_name, new_parameters),
+                new_parameters,
                "-v"]
 
         proc = subprocess.Popen(cmd,
