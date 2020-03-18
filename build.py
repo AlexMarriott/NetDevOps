@@ -9,7 +9,7 @@ import os
 import subprocess
 
 build_type = sys.argv[1]
-gns3_server = "192.168.59.130"
+gns3_server = "192.168.137.129"
 gns3_port = "3080"
 
 
@@ -74,24 +74,14 @@ class BuildAnsible():
             new_parameters = "{0}{1}.yaml --extra-vars {0}".format(ansible_path, script_name, parameters)
         else:
             new_parameters = "{0}{1}.yaml".format(ansible_path, script_name)
-        cmd = ["ansible-playbook",
-               "-i {0}{1},".format(ansible_path, self.host_file),
-               #"-e ansible_user={}".format('ansible'),
-               "-e ANSIBLE_HOST_KEY_CHECKING=False",
-                new_parameters,
-               "-vvvv"]
 
-        proc = subprocess.Popen(cmd,
-                                stdin=subprocess.PIPE,
-                                stdout=subprocess.PIPE,
-                                ).wait()
+        print("Running anasible script")
 
         try:
-            outs, errs = proc.communicate(timeout=15)
-            pprint.pprint(outs.decode().split('\n'))
-        except subprocess.SubprocessError as errs:
-            proc.kill()
-            sys.exit("Error: {}".format(errs))
+            os.system("ansible-playbook -i {0}{1} {2} -vvvv".format(ansible_path, self.host_file, new_parameters))
+        except Exception as e:
+            print(e)
+
 
 print("Starting Build process")
 
