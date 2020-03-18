@@ -12,6 +12,13 @@ build_type = sys.argv[1]
 gns3_server = "192.168.137.129"
 gns3_port = "3080"
 
+def build_path(*argv):
+    full_path = os.getcwd()
+    given_path = ""
+    for i in argv:
+        print(i)
+        given_path = os.path.join(given_path, i)
+    return os.path.join(full_path, given_path)
 
 class GNS3:
     def __init__(self, project_name):
@@ -68,15 +75,15 @@ class BuildAnsible():
         self.host_file = host_file
 
     def run_script(self, script_name, parameters=None):
-        ansible_path = "{0}/ansible_files/".format(os.getcwd())
+        ansible_path = build_path("ansible_files")
         #https://stackoverflow.com/questions/57763068/how-to-run-ansible-playbooks-with-subprocess
         if parameters is not None:
             new_parameters = "{0}{1}.yaml --extra-vars {0}".format(ansible_path, script_name, parameters)
         else:
             new_parameters = "{0}{1}.yaml".format(ansible_path, script_name)
 
-        print("Running anasible script")
-
+        print("Running ansible script")
+        print(new_parameters)
         try:
             os.system("ansible-playbook -i {0}{1} {2} -vvvv".format(ansible_path, self.host_file, new_parameters))
         except Exception as e:
@@ -103,8 +110,7 @@ if build_type.upper() == 'LAN':
     ansible.run_script("mini-lan-ssh")
 
     print("Running base test case")
-    base_test = {"hosts": "deployerserver",
-                 "script": "{0}/testcases/{1} --ips 192.168.12.1 192.168.12.2 192.168.12.3".format(os.getcwd(), "connectivity_check.py")}
+    base_test = '{"hosts": "deployerserver", "script": "{0} --ips 192.168.12.1 192.168.12.2 192.168.12.3"}'.format(build_path("testcases", "connectivity_check.py"))
 
     ansible.run_script("base-test", parameters=base_test)
 
