@@ -2,7 +2,7 @@
 #Need to pre-config the switches
 ---
 - name: Deploying base scripts to remote nodes
-  hosts: testnode
+  hosts: deployerserver
   gather_facts: no
   connection: local
   tasks:

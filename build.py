@@ -71,21 +71,23 @@ class GNS3:
         exit(0)
 
 class BuildAnsible():
-    def __init__(self, host_file, ):
+    def __init__(self, host_file):
         self.host_file = host_file
 
     def run_script(self, script_name, parameters=None):
-        ansible_path = build_path("ansible_files")
         #https://stackoverflow.com/questions/57763068/how-to-run-ansible-playbooks-with-subprocess
+        script_path = build_path("ansible_files",script_name)
+        host_file = build_path("ansible_files", "hosts")
         if parameters is not None:
-            new_parameters = "{0}{1}.yaml --extra-vars {0}".format(ansible_path, script_name, parameters)
+            new_parameters = "{0}.yaml -e {1}".format(script_path ,parameters)
         else:
-            new_parameters = "{0}{1}.yaml".format(ansible_path, script_name)
+            new_parameters = "{0}.yaml".format(script_path)
 
         print("Running ansible script")
         print(new_parameters)
+        print(host_file)
         try:
-            os.system("ansible-playbook -i {0}{1} {2} -vvvv".format(ansible_path, self.host_file, new_parameters))
+            os.system("ansible-playbook -i {0} {1} -vvvv".format(host_file, new_parameters))
         except Exception as e:
             print(e)
 
@@ -107,14 +109,13 @@ if build_type.upper() == 'LAN':
 
     print("Running the deployment scripts")
 
-    ansible.run_script("mini-lan-ssh")
+    #ansible.run_script("mini-lan-ssh")
 
     print("Running base test case")
-    base_test = '{"hosts": "deployerserver", "script": "{0} --ips 192.168.12.1 192.168.12.2 192.168.12.3"}'.format(build_path("testcases", "connectivity_check.py"))
+    base_test = {"'script': '{0} --ips 192.168.12.1 192.168.12.2 192.168.12.3'".format(build_path("testcases", "connectivity_check.py"))}
 
-    ansible.run_script("base-test", parameters=base_test)
+    ansible.run_script("deploy_file", parameters=base_test)
 
-    #This part will be running pyATS to test the topology of the new network.
     print("Running the python network tests")
     pass
 elif build_type.upper() == 'CLOUD':
