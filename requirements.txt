@@ -5,4 +5,3 @@ pyyaml
 requests
 docutils
 socket
-pytest

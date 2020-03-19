@@ -3,7 +3,6 @@ import socket
 import platform
 import subprocess
 import argparse
-import pytest
 
 def ping_ip(ip):
     #TODO add messuring of the packets.
