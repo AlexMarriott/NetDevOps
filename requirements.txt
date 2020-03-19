@@ -4,4 +4,3 @@ azure.mgmt.network
 pyyaml
 requests
 docutils
-socket
