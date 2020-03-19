@@ -74,7 +74,7 @@ class BuildAnsible():
         script_path = build_path("ansible_files",script_name)
         host_file = build_path("ansible_files", "hosts")
         if parameters is not None:
-            new_parameters = "{0}.yaml -e {1}".format(script_path ,parameters)
+            new_parameters = "{0}.yaml --extra-vars {1}".format(script_path ,parameters)
         else:
             new_parameters = "{0}.yaml".format(script_path)
 
@@ -83,8 +83,10 @@ class BuildAnsible():
         print(host_file)
         try:
             os.system("ansible-playbook -i {0} {1} -vvvv".format(host_file, new_parameters))
+            return True
         except Exception as e:
             print(e)
+            return False
 
 
 print("Starting Build process")
@@ -103,16 +105,24 @@ if build_type.upper() == 'LAN':
     ansible = BuildAnsible("hosts")
 
     print("Running the deployment scripts")
-
-    ansible.run_script("mini-lan-ssh")
-
+    '''
+    deploy = ansible.run_script("mini-lan-ssh")
+    if not deploy:
+        print("Something went wrong")
+        exit(1)
+    '''
     print("Running base test case")
-    base_test = {"--extra-vars 'script={0} ips=192.168.12.1 192.168.12.2 192.168.12.3'".format(build_path("testcases", "connectivity_check.py"))}
+    base_test = "'script={0} ips=192.168.12.1,192.168.12.2,192.168.12.3'".format(build_path("testcases", "connectivity_check.py"))
 
-    ansible.run_script("deploy_file", parameters=base_test)
+    base = ansible.run_script("deploy_file", parameters=base_test)
+    if not base:
+        #Should put a exit handle function here.
+        print("Something went wrong")
+        exit(1)
 
     print("Running the python network tests")
-    pass
+
+
 elif build_type.upper() == 'CLOUD':
     print("Running Cloud network deployment")
     pass

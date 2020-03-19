@@ -6,11 +6,16 @@
   gather_facts: no
   connection: local
   vars:
-    ips_param: 192.168.12.1 192.168.12.2 192.168.12.3
-    script: connectivity_check.py
-    script_param: --ips {{ ips_param }} {{ script }}
+    ips_param: "{{ ips }}"
+    script_param: "{{ script }}"
   tasks:
-  - name: Running the base testcases for the network
-    script: ../testcases/connectivity_check.py --ips 192.168.12.1 192.168.12.2 192.168.12.3
-    args:
-      executable: python3
+    - name: Running the base testcases for the network
+      script: "{{ script_param }} --ips {{ ips_param }}"
+      args:
+          executable: python3
+
+    #- debug:
+    #    msg: "{{ script_param }} --ips {{ ips_param }}"
+
+
+

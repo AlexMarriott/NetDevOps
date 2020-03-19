@@ -23,7 +23,11 @@ if __name__ == "__main__":
     ips = parser.parse_args() if not None else None
     if ips.__dict__['ips'] is not None:
         for ip in ips.__dict__['ips']:
-            ping_ip(ip)
+            # this is trash but idc
+            ip_block = ip.split(",")
+            for i in ip_block:
+                print(i)
+                ping_ip(i)
     else:
         print("No Ip addresses were passed into the script.")
 
