@@ -1,12 +1,7 @@
-import pprint
 import sys
-from collections import namedtuple
-
 import requests
 import json
-import yaml
 import os
-import subprocess
 
 build_type = sys.argv[1]
 gns3_server = "192.168.137.129"
@@ -109,7 +104,7 @@ if build_type.upper() == 'LAN':
 
     print("Running the deployment scripts")
 
-    #ansible.run_script("mini-lan-ssh")
+    ansible.run_script("mini-lan-ssh")
 
     print("Running base test case")
     base_test = {"--extra-vars 'script={0} ips=192.168.12.1 192.168.12.2 192.168.12.3'".format(build_path("testcases", "connectivity_check.py"))}
