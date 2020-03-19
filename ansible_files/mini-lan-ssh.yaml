@@ -6,6 +6,9 @@
   gather_facts: no
   connection: local
   tasks:
+  #wait for the cisco nodes to switch on.
+  - pause:
+      seconds : 5
   - name: configure the login banner
     ios_banner:
       banner: login
