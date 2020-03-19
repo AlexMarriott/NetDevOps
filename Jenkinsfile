@@ -9,7 +9,7 @@ pipeline {
     stage('Run Tests') {
       agent {
         node {
-          label 'Buildserver'
+          label 'BuildServer'
         }
 
       }
