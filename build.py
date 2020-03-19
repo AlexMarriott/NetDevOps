@@ -105,12 +105,12 @@ if build_type.upper() == 'LAN':
     ansible = BuildAnsible("hosts")
 
     print("Running the deployment scripts")
-    '''
+
     deploy = ansible.run_script("mini-lan-ssh")
     if not deploy:
         print("Something went wrong")
         exit(1)
-    '''
+
     print("Running base test case")
     base_test = "'script={0} ips=192.168.12.1,192.168.12.2,192.168.12.3'".format(build_path("testcases", "connectivity_check.py"))
 
