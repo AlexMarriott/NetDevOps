@@ -1,0 +1,27 @@
+pipeline {
+  agent {
+    node {
+      label 'buildserver'
+    }
+
+  }
+  stages {
+    stage('Run Tests') {
+      agent {
+        node {
+          label 'Buildserver'
+        }
+
+      }
+      steps {
+        sh '''#!/bin/bash
+python3 -m venv venv 
+source /venv/bin/actative
+pip3 install -r requirements.txt
+
+python3 build.py lan'''
+      }
+    }
+
+  }
+}
