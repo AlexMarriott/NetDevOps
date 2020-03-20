@@ -24,7 +24,7 @@ if build_type.upper() == 'LAN':
     print("Running Lan network deployment")
     print("Opening GNS3 Lab and powering on nodes")
 
-    g = GNS3("basenetwork1")
+    g = GNS3(gns3_server, gns3_port, "basenetwork1")
     id = g.find_project_id()
     print(g.open_project(id))
     print(g.start_nodes(id))
