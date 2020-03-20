@@ -15,8 +15,6 @@ pipeline {
       }
       steps {
         sh '''#!/bin/bash
-python3 -m venv venv 
-source /venv/bin/actative
 pip3 install -r requirements.txt
 
 python3 build.py lan'''
