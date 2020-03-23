@@ -22,4 +22,9 @@
       - /bin/ufw enable
 
   - name: Adding a FTP user
-    command: adduser ftpuser
+    command: "{{ item }}"
+    with_items:
+      - adduser ftpuser
+      - usermod -d /var/www ftpuser
+      - chown ftpuser:ftpuser /var/www/html
+      - systemctl restart vsftpd
