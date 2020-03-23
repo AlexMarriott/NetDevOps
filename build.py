@@ -47,16 +47,25 @@ if build_type.upper() == 'LAN':
 
 
 elif build_type.upper() == 'CLOUD':
+
+    print("Uploading commonly used files to azure storage")
+    azure_api = AzureApi()
+    upload_files = [{"file_name": "install_ansible.sh", "file_path": build_path("deployment_files", "bash")},
+                    {"file_name": "deploy_services.yaml", "file_path": build_path("deployment_files", "ansible_cloud")},
+                    {"file_name": "hosts", "file_path": build_path("deployment_files")}]
+    for file in upload_files:
+        upload = azure_api.file_upload(file_name=file['file_name'], local_path=file['file_path'])
+
     print("Running Cloud network deployment")
     # This will be a deployment into azure where we test the network secutriy groups along with the nodes which can run routing rules.
 
     print("Creating azure nodes")
     #Naming convention should be Subnet-vm-num
-    vms = [{"vm_name": "Office1-VM", "ip_assignment_type":"Static", "ip_address":"192.168.11.10"},
-           {"vm_name":"Office2-VM", "ip_assignment_type":"Static", "ip_address":"192.168.12.10"},
-           {"vm_name":"Office3-VM", "ip_assignment_type":"Static", "ip_address":"192.168.13.10"}]
+    vms = [{"vm_name": "Office1-VM", "ip_assignment_type": "Static", "ip_address": "192.168.11.10"},
+           {"vm_name": "Office2-VM", "ip_assignment_type": "Static", "ip_address": "192.168.12.10"},
+           {"vm_name": "Office3-VM", "ip_assignment_type": "Static", "ip_address": "192.168.13.10"}]
     azure_nodes = []
-    azure_api = AzureApi()
+
     for vm in vms:
         node = azure_api.create_node(vmname=vm["vm_name"], subnet=vm["vm_name"].split("-")[0],
                                      ip_assignment_type=vm["ip_assignment_type"], ip_address=vm["ip_address"])

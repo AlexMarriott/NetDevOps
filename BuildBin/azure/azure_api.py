@@ -3,6 +3,7 @@ from azure.mgmt.resource.resources.models import DeploymentMode
 from azure.mgmt.compute import ComputeManagementClient
 from azure.mgmt.network import NetworkManagementClient
 from azure.mgmt.resource import ResourceManagementClient
+from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient
 from msrestazure.azure_exceptions import CloudError
 import requests
 import random
@@ -25,10 +26,32 @@ class AzureApi():
         self.compute_client = ComputeManagementClient(self.credentials, self.subscription)
         self.network_client = NetworkManagementClient(self.credentials, self.subscription)
         self.resource_client = ResourceManagementClient(self.credentials, self.subscription)
+        self.blob_client = BlobServiceClient.from_connection_string("DefaultEndpointsProtocol=https;AccountName=csb8da8747714ecx488cxa18;AccountKey=2Exkk3UF3/X1wYa2KAY9/xrwJF0puih/Bd0QTcNO1tqPkVKJPokIyJuRPEwrj46UC2wxw5vvpweXluWSbf1q2Q==;EndpointSuffix=core.windows.net")
 
         self.vm_template = self.get_templates(os.path.abspath("BuildBin/azure/templates/create_linux.json"))
         self.nic_template = self.get_templates(os.path.abspath("BuildBin/azure/templates/create_nic.json"))
         self.rg_template = self.get_templates(os.path.abspath("BuildBin/azure/templates/create_rg.json"))
+
+    def file_upload(self, file_name, local_path):
+        # Used for uploading the deployment files to azure blob storage
+
+        # Create a file in local data directory to upload and download
+
+
+        upload_file_path = os.path.join(local_path, file_name)
+
+        # Create a blob client using the local file name as the name for the blob
+
+        blob_client = self.blob_client.get_blob_client(container="deploymentscripts", blob=file_name)
+
+
+        print("\nUploading to Azure Storage as blob:\n\t" + file_name)
+
+        # Upload the created file
+        with open(upload_file_path, "rb") as data:
+            blob_client.upload_blob(data, overwrite=True)
+
+        return blob_client.get_blob_properties()
 
     def create_node(self, vmname="R1TestNode", nic_name=None, subnet=None, ip_assignment_type=None, ip_address=None):
         if nic_name is None:
