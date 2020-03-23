@@ -30,24 +30,41 @@ class AzureApi():
         self.nic_template = self.get_templates(os.path.abspath("BuildBin/azure/templates/create_nic.json"))
         self.rg_template = self.get_templates(os.path.abspath("BuildBin/azure/templates/create_rg.json"))
 
-    def create_node(self, vmname="R1TestNode",nic_name=None,  subnet="Office1"):
+    def create_node(self, vmname="R1TestNode", nic_name=None, subnet=None, ip_assignment_type=None, ip_address=None):
         if nic_name is None:
             nic_name = vmname + str(random.randint(1, 100) * 5)
+        if subnet is None:
+            subnet = "Office1"
+        if ip_assignment_type is None or ip_address is None:
+            ip_assignment_type = "Dynamic"
+            ip_address = ''
+
+        print(ip_assignment_type)
+        print(ip_address)
+
         parameters = {'networkInterfaceName': nic_name, 'location': 'uksouth', 'subnetId': subnet}
         parameters = parameterise_values(parameters)
 
         # Create network interface card for the node
         print("Creating:{0}".format(nic_name))
+        template = self.prepare_nic_template(
+            self.resource_group,
+            subnet=subnet,
+            ip_assignment_type=ip_assignment_type,
+            ip_address=ip_address)
+        print(template)
         nic_deployment_async_operation = self.network_client.network_interfaces.create_or_update(self.resource_group,
                                                                                                  nic_name,
                                                                                                  self.prepare_nic_template(
                                                                                                      self.resource_group,
-                                                                                                     network_interface_name=
-                                                                                                     parameters[
-                                                                                                         'networkInterfaceName']))
+                                                                                                     subnet=subnet,
+                                                                                                     ip_assignment_type=ip_assignment_type,
+                                                                                                     ip_address=ip_address))
+        # network_interface_name=parameters['networkInterfaceName']))
         nic_deployment_async_operation.wait()
 
         print("Creating:{0}".format(vmname))
+
         deployment_async_operation = self.compute_client.virtual_machines.create_or_update(self.resource_group, vmname,
                                                                                            self.prepare_vm_template(
                                                                                                self.resource_group,
@@ -55,13 +72,13 @@ class AzureApi():
                                                                                                vmname))
         deployment_async_operation.wait()
         vm = self.compute_client.virtual_machines.get(self.resource_group, vmname)
-        nic_ip = self.network_client.network_interfaces.get(self.resource_group,nic_name)
+        nic_ip = self.network_client.network_interfaces.get(self.resource_group, nic_name)
         disk_name = vm.storage_profile.os_disk.name
 
         return {"vm": vm,
                 "resource_group": self.resource_group,
-                "nic_name":nic_name,
-                "nic_ip":nic_ip.ip_configurations[0].private_ip_address,
+                "nic_name": nic_name,
+                "nic_ip": nic_ip.ip_configurations[0].private_ip_address,
                 "disk_name": disk_name}
 
     def get_node(self, vmname, expand=""):
@@ -70,20 +87,19 @@ class AzureApi():
 
     def delete_node(self, node):
         try:
-            print("deleting:{0}".format(node.name))
+            print("deleting resource group :{0}".format(node.name))
             async_delete = self.compute_client.virtual_machines.delete(self.resource_group, node.name)
             async_delete.wait()
             print(async_delete.status())
 
-
             async_nic_delete = self.network_client.network_interfaces.delete(self.resource_group, node.nic_name)
-            print("deleting:{0}".format(node.nic_name))
+            print("deleting nic :{0}".format(node.nic_name))
 
             async_nic_delete.wait()
             print(async_nic_delete.status())
 
             async_disk_delete = self.compute_client.disks.delete(self.resource_group, node.disk_name)
-            print("deleting:{0}".format(node.disk_name))
+            print("deleting disk :{0}".format(node.disk_name))
             async_disk_delete.wait()
             print(async_disk_delete.status())
 
@@ -94,7 +110,6 @@ class AzureApi():
             return 404
         return 404
 
-
     def get_templates(self, template):
         with open(template, 'r') as template_file_fd:
             return json.load(template_file_fd)
@@ -104,7 +119,8 @@ class AzureApi():
                              network_interface_name='test_nice_' + str(random.randint(1, 10) * 5),
                              location="uksouth",
                              subnet="Office1",
-                             ip_assigmnet_method="Dynamic"):
+                             ip_assignment_type="Dynamic",
+                             ip_address=""):
         return {
             "location": "{0}".format(location),
             "type": "Microsoft.Network/networkInterfaces",
@@ -115,7 +131,8 @@ class AzureApi():
                         "name": "ipconfig1",
                         "properties": {
                             "privateIpAddressVersion": "IPv4",
-                            "privateIPAllocationMethod": "{0}".format(ip_assigmnet_method),
+                            "privateIPAllocationMethod": "{0}".format(ip_assignment_type),
+                            "privateIPAddress": "{0}".format(ip_address),
                             "subnet": {
                                 "id": "/subscriptions/8da87477-14ec-488c-a181-1dbdcc25525e/resourceGroups/TestNetwork/providers/Microsoft.Network/virtualNetworks/TestNetwork/subnets/{1}".format(
                                     resource_group,

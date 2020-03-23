@@ -73,5 +73,4 @@ class AzureApiTest(unittest.TestCase):
 
         for node in test_node_objects:
             print("deleting: {0}".format(node))
-            azure_api.delete_node(node)
             self.assertEquals(azure_api.delete_node(node), "succeeded")

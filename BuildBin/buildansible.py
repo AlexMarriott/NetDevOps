@@ -7,8 +7,8 @@ class BuildAnsible():
 
     def run_script(self, script_name, parameters=None):
         #https://stackoverflow.com/questions/57763068/how-to-run-ansible-playbooks-with-subprocess
-        script_path = build_path("ansible_files",script_name)
-        host_file = build_path("ansible_files", "hosts")
+        script_path = build_path("deployment_files",script_name)
+        host_file = build_path("deployment_files", "hosts")
         if parameters is not None:
             new_parameters = "{0}.yaml --extra-vars {1}".format(script_path ,parameters)
         else:
