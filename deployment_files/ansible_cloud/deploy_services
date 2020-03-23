@@ -2,12 +2,12 @@
 #Need to pre-config the switches
 ---
 - name: Installing apache and FTP on Office 1 and Office 3 VM's
-  hosts: OfficeVm1, OfficeVm3
+  hosts: 127.0.0.1
   gather_facts: yes
   connection: local
   tasks:
   - name: Install apache2
-    apt: name=apach2 update_cache=yes state=latest
+    apt: name=apache2 update_cache=yes state=latest
 
   - name: Install FTP
     apt: name=vsftpd update_cache=yes state=latest
@@ -15,16 +15,40 @@
   - name: Adding Firewall rules
     command: "{{ item }}"
     with_items:
-      - /bin/ufw allow OpenSSH
-      - /bin/ufw allow 21/tcp
-      - /bin/ufw allow 40000:50000/tcp
-      - /bin/ufw allow 990/tcp
-      - /bin/ufw enable
+      - /usr/sbin/ufw allow OpenSSH
+      - /usr/sbin/ufw allow 21/tcp
+      - /usr/sbin/ufw allow 80/tcp
+      - /usr/sbin/ufw allow 40000:50000/tcp
+      - /usr/sbin/ufw allow 990/tcp
+      - /usr/sbin/ufw enable
+    ignore_errors: yes
 
   - name: Adding a FTP user
     command: "{{ item }}"
     with_items:
-      - adduser ftpuser
+      - useradd -m -p "ftpuser"-s /bin/bash ftpuser
       - usermod -d /var/www ftpuser
       - chown ftpuser:ftpuser /var/www/html
       - systemctl restart vsftpd
+    ignore_errors: yes
+
+  - name: Allowing writing in the ftp conf
+    lineinfile: dest=/etc/vsftpd.conf regexp="^#write_enable=YES" line="write_enable=YES"
+
+  - name: Allowing chroot in the ftp conf
+    lineinfile: dest=/etc/vsftpd.conf regexp="^#chroot_local_user=YES" line="chroot_local_user=YES"
+
+  - name: Allowing correct permissions in the ftp conf
+    lineinfile: dest=/etc/vsftpd.conf regexp="^#local_umask=022" line="local_umask=022"
+
+  - name: Allowing force dot files in ftp
+    lineinfile: dest=/etc/vsftpd.conf line="force_dot_files=YES"
+
+  - name: Allowing port 40000
+    lineinfile: dest=/etc/vsftpd.conf line="pasv_min_port=40000"
+
+  - name: Allowing port 50000
+    lineinfile: dest=/etc/vsftpd.conf line="pasv_max_port=50000"
+
+  - name: Restarting FTP service
+    command: systemctl restart vsftpd
