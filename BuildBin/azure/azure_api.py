@@ -26,7 +26,7 @@ class AzureApi():
         self.compute_client = ComputeManagementClient(self.credentials, self.subscription)
         self.network_client = NetworkManagementClient(self.credentials, self.subscription)
         self.resource_client = ResourceManagementClient(self.credentials, self.subscription)
-        self.blob_client = BlobServiceClient.from_connection_string("DefaultEndpointsProtocol=https;AccountName=csb8da8747714ecx488cxa18;AccountKey=2Exkk3UF3/X1wYa2KAY9/xrwJF0puih/Bd0QTcNO1tqPkVKJPokIyJuRPEwrj46UC2wxw5vvpweXluWSbf1q2Q==;EndpointSuffix=core.windows.net")
+        self.blob_client = BlobServiceClient.from_connection_string("DefaultEndpointsProtocol=https;AccountName=deploymentscriptsdiss;AccountKey=g1vYoqg06Ir5fM3dRW4kNBJFJV5DdqHR25EnNFS4ujin4df+oRL/bvxQcOCmK9IPMaB6eZ9ze1hS92HkkkijsA==;EndpointSuffix=core.windows.net")
 
         self.vm_template = self.get_templates(os.path.abspath("BuildBin/azure/templates/create_linux.json"))
         self.nic_template = self.get_templates(os.path.abspath("BuildBin/azure/templates/create_nic.json"))

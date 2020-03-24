@@ -1,5 +1,4 @@
 import sys
-import os
 
 from BuildBin.buildansible import BuildAnsible
 from BuildBin.gns3 import GNS3
@@ -61,8 +60,8 @@ elif build_type.upper() == 'CLOUD':
 
     print("Creating azure nodes")
     #Naming convention should be Subnet-vm-num
-    vms = [{"vm_name": "Office1-VM", "ip_assignment_type": "Static", "ip_address": "192.168.11.10"},
-           {"vm_name": "Office2-VM", "ip_assignment_type": "Static", "ip_address": "192.168.12.10"},
+    vms = [#{"vm_name": "Office1-VM", "ip_assignment_type": "Static", "ip_address": "192.168.11.10"},
+           #{"vm_name": "Office2-VM", "ip_assignment_type": "Static", "ip_address": "192.168.12.10"},
            {"vm_name": "Office3-VM", "ip_assignment_type": "Static", "ip_address": "192.168.13.10"}]
     azure_nodes = []
 
