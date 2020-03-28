@@ -2,15 +2,27 @@
 #Need to pre-config the switches
 ---
 - name: Installing apache and FTP on Office 1 and Office 3 VM's
-  hosts: 127.0.0.1
+  hosts: 192.168.13.10
+  become: yes
   gather_facts: yes
   connection: local
   tasks:
-  - name: Install apache2
-    apt: name=apache2 update_cache=yes state=latest
+  - name: updating the apt cache
+    apt: update_cache=yes force_apt_get=yes cache_valid_time=3600
 
-  - name: Install FTP
-    apt: name=vsftpd update_cache=yes state=latest
+#  - name: Wait until apt lock file is removed
+#  wait_for:
+#    path: /var/lock/file.lock
+#    state: absent
+
+  - name: Install apache2 & FTP
+    apt: 
+      pkg:
+      - vsftpd
+      - apache2
+      update_cache: yes 
+      state: latest
+      install_recommends: yes
 
   - name: Adding Firewall rules
     command: "{{ item }}"
@@ -24,13 +36,24 @@
     ignore_errors: yes
 
   - name: Adding a FTP user
-    command: "{{ item }}"
-    with_items:
-      - useradd -m -p "ftpuser"-s /bin/bash ftpuser
-      - usermod -d /var/www ftpuser
-      - chown ftpuser:ftpuser /var/www/html
-      - systemctl restart vsftpd
-    ignore_errors: yes
+    user:
+      name: ftpuser
+      shell: /bin/bash
+      password: 'ftpuser'
+      home: /var/www/
+    ignore_errors: no
+
+  - name: Changing the file permissions for the ftp dir
+    file:
+      path: /var/www/html
+      owner: ftpuser
+      group: ftpuser
+      mode: '0744'
+
+  - name: Restarting the ansible service
+    service:
+      name: vsftpd
+      state: restarted
 
   - name: Allowing writing in the ftp conf
     lineinfile: dest=/etc/vsftpd.conf regexp="^#write_enable=YES" line="write_enable=YES"
