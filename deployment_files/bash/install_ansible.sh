@@ -9,6 +9,8 @@ apt update && apt upgrade -y && apt install ansible sshpass python3 python3-pip 
 
 touch password.txt && echo "Movingonup2016" > password.txt
 
-sshpass -p "Movingonup2016" ssh-copy-id -i ~/.ssh/sshkey.pub amarriott@192.168.11.10
+rm -rf /root/.ssh/known_hosts
+
+sshpass -f password.txt ssh-copy-id -i ~/.ssh/sshkey.pub amarriott@192.168.11.10
 sshpass -f password.txt ssh-copy-id -i ~/.ssh/sshkey.pub amarriott@192.168.13.10
 
