@@ -5,6 +5,8 @@
   hosts: OfficeVm1:OfficeVm3 
   become: yes
   gather_facts: yes
+  vars:
+    password: ftpuser
   tasks:
   #- name: updating the apt cache
   #  apt: update_cache=yes force_apt_get=yes cache_valid_time=3600
@@ -71,8 +73,7 @@
   - name: Adding a FTP user
     user:
       name: ftpuser
-      shell: /bin/bash
-      password: ftpuser
+      password: "{{ password | password_hash('sha512') }}"
       home: /var/www/
 
   - name: Changing the file permissions for the ftp dir
