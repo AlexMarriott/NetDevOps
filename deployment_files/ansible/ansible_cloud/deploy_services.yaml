@@ -8,9 +8,6 @@
   tasks:
   #- name: updating the apt cache
   #  apt: update_cache=yes force_apt_get=yes cache_valid_time=3600
-
-  - pause:
-      seconds: 10
   
   - name: Install FTP
     apt:
@@ -75,7 +72,7 @@
     user:
       name: ftpuser
       shell: /bin/bash
-      password: 'ftpuser'
+      password: ftpuser
       home: /var/www/
 
   - name: Changing the file permissions for the ftp dir

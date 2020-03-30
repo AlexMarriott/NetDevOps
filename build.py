@@ -50,8 +50,8 @@ elif build_type.upper() == 'CLOUD':
     print("Uploading commonly used files to azure storage")
     azure_api = AzureApi()
     upload_files = [{"file_name": "install_ansible.sh", "file_path": build_path("deployment_files", "bash")},
-                    {"file_name": "deploy_services.yaml", "file_path": build_path("deployment_files", "ansible_cloud")},
-                    {"file_name": "hosts", "file_path": build_path("deployment_files")}]
+                    {"file_name": "deploy_services.yaml", "file_path": build_path("deployment_files", "ansible", "ansible_cloud")},
+                    {"file_name": "hosts", "file_path": build_path("deployment_files", "ansible")}]
     for file in upload_files:
         upload = azure_api.file_upload(file_name=file['file_name'], local_path=file['file_path'])
 
