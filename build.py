@@ -48,7 +48,7 @@ if build_type.upper() == 'LAN':
 
 
 elif build_type.upper() == 'CLOUD':
-    '''
+
 
     print("Uploading commonly used files to azure storage")
     azure_api = AzureApi()
@@ -62,7 +62,7 @@ elif build_type.upper() == 'CLOUD':
 
     for file in upload_files:
         upload = azure_api.file_upload(file_name=file['file_name'], local_path=file['file_path'])
-    '''
+
 
     print("Running Cloud network deployment")
 
@@ -89,20 +89,20 @@ elif build_type.upper() == 'CLOUD':
 
     print("Downloading the deployment files.")
     for file in deployment_files:
-        print(file)
         print(ssh.exec_command("cd deployment && curl '{0}' > {1} && chmod 777 {1} && dos2unix {1}".format(file["url"], file["file_name"])))
+        if file == "all.yaml":
+            ssh.exec_command("mkdir group_vars && mv all.yaml group_vars")
 
 
     print("Running node setup script")
-    print(ssh.exec_command("(cd deployment; pwd)".format(amarriott_password)))
     print(ssh.exec_command("(cd deployment; echo {0} | sudo ./install_ansible.sh)".format(amarriott_password)))
 
     print("Running ansible playbook")
-    print(ssh.exec_command("cd deployment && echo {0} | sudo ansible-playbook -i hosts deploy_services.yaml -vvvv".format(amarriott_password)))
+    print(ssh.exec_command("echo {0} | sudo chmod 777 sshkey.pub sshkey; echo {0} | sudo -s; cd deployment; ansible-playbook -i hosts deploy_services.yaml".format(amarriott_password)))
 
     print("Running connectivity testing and service testing")
     for file in ["connectivity_check.py -- ips 192.168.13.10,192.168.11.10"]:
-        print(ssh.exec_command("cd deployment && echo {0} | sudo python3 {1}".format(amarriott_password, file)))
+        print(ssh.exec_command("cd deployment; echo {0} | sudo python3 {1}".format(amarriott_password, file)))
 
     ssh.client.close()
     '''

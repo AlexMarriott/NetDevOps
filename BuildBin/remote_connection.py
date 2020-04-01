@@ -26,7 +26,7 @@ class RemoteSSH:
 
     def permission_check(self, file):
         pass
-    def exec_command(self, command, bufsize=1, timeout=10):
+    def exec_command(self, command, bufsize=1, timeout=30):
         try:
             stdin, stdout, stderr = self.client.exec_command(command, bufsize, timeout)
             exit_status = stdout.channel.recv_exit_status()
@@ -35,6 +35,7 @@ class RemoteSSH:
                 return stdout.read()
             else:
                 print("Error", exit_status)
+                print(stdout.read(), stderr.read())
                 return stderr.read()
         except SSHException as e:
             print("error")
