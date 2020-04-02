@@ -133,12 +133,6 @@ elif build_type.upper() == 'CLOUD':
 
     ssh.client.close()
 
-
-
-
-'''
-    
-    
     print("deleting the azure nodes")
     for vm in azure_nodes:
         status = azure_api.delete_node(vm)
@@ -147,4 +141,3 @@ elif build_type.upper() == 'CLOUD':
             print("{0} deleted".format(vm['name']))
         else:
             print("Something went wrong when deleting the node. ")
-'''
