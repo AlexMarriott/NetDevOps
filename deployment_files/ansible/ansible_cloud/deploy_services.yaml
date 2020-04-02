@@ -70,15 +70,20 @@
     ufw:
       state: enabled
 
+  - name: Create directory
+    file:
+      path: /var/ftp/public
+      state: directory
+
   - name: Adding a FTP user
     user:
       name: ftpuser
       password: "{{ password | password_hash('sha512') }}"
-      home: /var/www/
+      home: /var/ftp/public
 
   - name: Changing the file permissions for the ftp dir
     file:
-      path: /var/www/html
+      path: /var/ftp/public
       owner: ftpuser
       group: ftpuser
       mode: '0744'
@@ -90,6 +95,9 @@
 
   - name: Allowing writing in the ftp conf
     lineinfile: dest=/etc/vsftpd.conf regexp="^#write_enable=YES" line="write_enable=YES"
+
+  - name: Allowing writable chroot
+    lineinfile: dest=/etc/vsftpd.conf line="allow_writeable_chroot=YES"
 
   - name: Allowing chroot in the ftp conf
     lineinfile: dest=/etc/vsftpd.conf regexp="^#chroot_local_user=YES" line="chroot_local_user=YES"

@@ -64,7 +64,24 @@ elif build_type.upper() == 'CLOUD':
         upload = azure_api.file_upload(file_name=file['file_name'], local_path=file['file_path'])
 
     print("Running Cloud network deployment")
+    # This will be a deployment into azure where we test the network secutriy groups along with the nodes which can run routing rules.
 
+    print("Creating azure nodes")
+    # Naming convention should be Subnet-vm-num
+    vms = [{"vm_name": "Office1-VM", "ip_assignment_type": "Static", "ip_address": "192.168.11.10"},
+           # {"vm_name": "Office2-VM", "ip_assignment_type": "Static", "ip_address": "192.168.12.10"},
+           {"vm_name": "Office3-VM", "ip_assignment_type": "Static", "ip_address": "192.168.13.10"}]
+    azure_nodes = []
+
+    for vm in vms:
+        node = azure_api.create_node(vmname=vm["vm_name"], subnet=vm["vm_name"].split("-")[0],
+                                     ip_assignment_type=vm["ip_assignment_type"], ip_address=vm["ip_address"])
+
+        azure_nodes.append(AzureNode(name=node['vm'].name, resource_group=node['resource_group'],
+                                     nic_name=node['nic_name'], nic_ip=node['nic_ip'],
+                                     disk_name=node['disk_name']))
+
+    print("Cloud nodes deployed, moving on the base deployment")
     ssh = RemoteSSH(hostname='51.140.73.210', username="amarriott", password=amarriott_password, port=22)
     ssh.connect()
 
@@ -110,7 +127,8 @@ elif build_type.upper() == 'CLOUD':
             amarriott_password)))
 
     print("Running connectivity testing and service testing")
-    for file in ["connectivity_check.py --ips 192.168.13.10,192.168.11.10", "service_checker.py"]:
+    for file in ["connectivity_check.py --ips 192.168.13.10,192.168.11.10",
+                 "service_checker.py --ips 192.168.11.10,192.168.13.10 --services FTP,HTTP"]:
         print(ssh.exec_command("cd deployment; echo {0} | sudo python3 {1}".format(amarriott_password, file)))
 
     ssh.client.close()
@@ -119,24 +137,7 @@ elif build_type.upper() == 'CLOUD':
 
 
 '''
-    # This will be a deployment into azure where we test the network secutriy groups along with the nodes which can run routing rules.
-
-    print("Creating azure nodes")
-    #Naming convention should be Subnet-vm-num
-    vms = [{"vm_name": "Office1-VM", "ip_assignment_type": "Static", "ip_address": "192.168.11.10"},
-           #{"vm_name": "Office2-VM", "ip_assignment_type": "Static", "ip_address": "192.168.12.10"},
-           {"vm_name": "Office3-VM", "ip_assignment_type": "Static", "ip_address": "192.168.13.10"}]
-    azure_nodes = []
-
-    for vm in vms:
-        node = azure_api.create_node(vmname=vm["vm_name"], subnet=vm["vm_name"].split("-")[0],
-                                     ip_assignment_type=vm["ip_assignment_type"], ip_address=vm["ip_address"])
-        
-        azure_nodes.append(AzureNode(name=node['vm'].name, resource_group=node['resource_group'],
-                                     nic_name=node['nic_name'], nic_ip=node['nic_ip'],
-                                     disk_name=node['disk_name']))
-
-    print("Cloud nodes deployed, moving on the base deployment")
+    
     
     print("deleting the azure nodes")
     for vm in azure_nodes:
