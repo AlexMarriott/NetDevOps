@@ -18,10 +18,10 @@
       state: present
       install_recommends: yes
 
-  - name: install apache2
+  - name: install nginx
     #become: true
     apt:
-      name: apache2
+      name: nginx
       update_cache: yes
       state: present
       install_recommends: yes
