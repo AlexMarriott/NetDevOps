@@ -1,7 +1,8 @@
+import os
 import sys
 import paramiko
 
-from BuildBin.buildansible import BuildAnsible
+from BuildBin.build_ansible import BuildAnsible
 from BuildBin.gns3 import GNS3
 from BuildBin.remote_connection import RemoteSSH
 from BuildBin.azure.models import AzureNode
@@ -26,11 +27,11 @@ if build_type.upper() == 'LAN':
     print(g.open_project(id))
     print(g.start_nodes(id))
 
-    ansible = BuildAnsible("hosts")
+    ansible = BuildAnsible(build_path("hosts", "deployment_files", "ansible"))
 
     print("Running the deployment scripts")
 
-    deploy = ansible.run_script("mini-lan-ssh")
+    deploy = ansible.run_script("mini-lan-ssh", script_path=build_path("deployment_files", "ansible", "ansible_lan"))
     if not deploy:
         print("Something went wrong")
         exit(1)
@@ -38,7 +39,7 @@ if build_type.upper() == 'LAN':
     print("Running base test case")
     base_test = "'script={0} ips=192.168.12.1,192.168.12.2,192.168.12.3'".format(build_path("deployment_files","testcases", "connectivity_check.py"))
 
-    base = ansible.run_script("deploy_file", parameters=base_test)
+    base = ansible.run_script("deploy_file", script_path=build_path("deployment_files", "ansible", "ansible_lan"), parameters=base_test)
     if not base:
         #Should put a exit handle function here.
         print("Something went wrong")
