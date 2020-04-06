@@ -1,0 +1,28 @@
+#Lan Instances
+[lan]
+R1=192.168.12.1
+R2=192.168.12.2
+R3=192.168.12.3
+deployerserver=192.168.12.4
+
+[lan:vars]
+ansible_ssh_common_args='-o HostKeyAlgorithms=ssh-rsa -o KexAlgorithms=diffie-hellman-group1-sha1 -o Ciphers=aes256-cbc,6-cbc,3des-cbc -o MACs=hmac-md5,hmac-sha2-512'
+ansible_connection=network_cli
+ansible_network_os=ios
+ansible_user=Cisco
+ansible_password=Cisco
+ansible_become=yes
+ansible_become_method=enable
+ansible_become_password=Cisco
+
+#Cloud Instances
+[cloud]
+OfficeVm1=192.168.12.1
+OfficeVm2=192.168.12.10
+OfficeVm3=192.168.13.10
+
+[cloud:vars]
+ansible_user=amarriott
+ansible_password=Movingonup2016
+ansible_become=yes
+ansible_become_password=Movingonup2016
