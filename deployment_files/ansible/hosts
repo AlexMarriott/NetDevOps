@@ -3,7 +3,7 @@
 R1 ansible_host=192.168.12.1
 R2 ansible_host=192.168.12.2
 R3 ansible_host=192.168.12.3
-deployerserver ansible_host=192.168.12.4
+deployerserver ansible_host=192.168.12.4 ansible_connection=ssh ansible_ssh_common_args=''
 
 [lan:vars]
 ansible_ssh_common_args='-o HostKeyAlgorithms=ssh-rsa -o KexAlgorithms=diffie-hellman-group1-sha1 -o Ciphers=aes256-cbc,6-cbc,3des-cbc -o MACs=hmac-md5,hmac-sha2-512'
