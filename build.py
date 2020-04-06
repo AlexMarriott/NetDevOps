@@ -26,8 +26,7 @@ if build_type.upper() == 'LAN':
     id = g.find_project_id()
     print(g.open_project(id))
     print(g.start_nodes(id))
-
-    ansible = BuildAnsible(build_path("hosts", "deployment_files", "ansible"))
+    ansible = BuildAnsible(build_path("deployment_files", "ansible", "hosts"))
 
     print("Running the deployment scripts")
 
