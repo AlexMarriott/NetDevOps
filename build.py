@@ -117,8 +117,6 @@ elif build_type.upper() == 'CLOUD':
     print("Running node setup script")
     print(ssh.exec_command("(cd deployment; echo {0} | sudo ./install_ansible.sh)".format(amarriott_password)))
 
-    print("Waiting 30 seconds for the azure nodes to setup")
-    time.sleep(30)
     print("Running ansible playbook")
     ansible_command = ssh.exec_command(
         "echo {0} | sudo chmod 777 sshkey.pub sshkey; echo {0} | sudo -s; cd deployment; ansible-playbook -i hosts deploy_services.yaml".format(
