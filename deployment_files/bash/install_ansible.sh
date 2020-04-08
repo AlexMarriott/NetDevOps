@@ -10,7 +10,7 @@ sudo -u amarriott ssh-keygen -b 2048 -t rsa -q -N '' -f /home/amarriott/.ssh/ssh
 sudo -u amarriott  sshpass -p "Movingonup2016" ssh-copy-id -i /home/amarriott/.ssh/sshkey.pub amarriott@192.168.11.10
 sudo -u amarriott  sshpass -p "Movingonup2016" ssh-copy-id -i /home/amarriott/.ssh/sshkey.pub amarriott@192.168.13.10
 
-sudo -u amarriott  chmod 777 /home/amarriott/.ssh/sshkey.pub /home/amarriott/.ssh/sshkey && sudo -u amarriott  chown amarriott.amarriott /home/amarriott/.ssh/sshkey /home/amarriott/.ssh/sshkey.pub
+sudo -u amarriott  chmod 744 /home/amarriott/.ssh/sshkey*  && sudo -u amarriott  chown amarriott.amarriott /home/amarriott/.ssh/sshkey*
 
 sudo -u amarriott  ssh-agent bash
 sudo -u amarriott  ssh-add ~/.ssh/sshkey
