@@ -1,6 +1,7 @@
 import os
 import sys
 import paramiko
+import time
 
 from BuildBin.build_ansible import BuildAnsible
 from BuildBin.gns3 import GNS3
@@ -54,7 +55,6 @@ elif build_type.upper() == 'CLOUD':
     azure_api = AzureApi()
     upload_files = [{"file_name": "install_ansible.sh", "file_path": build_path("deployment_files", "bash")},
                     {"file_name": "deploy_services.yaml", "file_path": build_path("deployment_files", "ansible", "ansible_cloud")},
-                    {"file_name": "cloud.yaml", "file_path": build_path("deployment_files", "ansible", "group_vars")},
                     {"file_name": "ansible.cfg", "file_path": build_path("deployment_files", "ansible")},
                     {"file_name": "hosts", "file_path": build_path("deployment_files", "ansible")},
                     {"file_name": "service_checker.py", "file_path": build_path("deployment_files", "testcases")},
@@ -88,8 +88,6 @@ elif build_type.upper() == 'CLOUD':
     print("running deployment files.")
 
     deployment_files = [
-        {"file_name": "cloud.yaml",
-         "url": "https://deploymentscriptsdiss.blob.core.windows.net/deploymentscripts/all.yaml?sp=r&st=2020-04-01T11:37:53Z&se=2031-06-05T19:37:53Z&spr=https&sv=2019-02-02&sr=b&sig=qWIG3oO07wJ3EyjFQqpOAup2R7M0pNxjx7V7vIglTHU%3D"},
         {"file_name": "ansible.cfg",
          "url": "https://deploymentscriptsdiss.blob.core.windows.net/deploymentscripts/ansible.cfg?sp=r&st=2020-04-01T11:40:11Z&se=2030-01-01T20:40:11Z&spr=https&sv=2019-02-02&sr=b&sig=eiVkp9mjnLT43INs3EOS%2BwPQW6awalHp4MkhNrIrndI%3D"},
         {"file_name": "deploy_services.yaml",
@@ -115,16 +113,20 @@ elif build_type.upper() == 'CLOUD':
         print(ssh.exec_command("cd deployment && curl '{0}' > {1} && chmod 777 {1} && dos2unix {1}".format(file["url"],
                                                                                                            file[
                                                                                                                "file_name"])))
-        if file == "cloud.yaml":
-            ssh.exec_command("mkdir group_vars && mv cloud.yaml group_vars")
 
     print("Running node setup script")
     print(ssh.exec_command("(cd deployment; echo {0} | sudo ./install_ansible.sh)".format(amarriott_password)))
 
+    print("Waiting 30 seconds for the azure nodes to setup")
+    time.sleep(30)
     print("Running ansible playbook")
-    print(ssh.exec_command(
+    ansible_command = ssh.exec_command(
         "echo {0} | sudo chmod 777 sshkey.pub sshkey; echo {0} | sudo -s; cd deployment; ansible-playbook -i hosts deploy_services.yaml".format(
-            amarriott_password)))
+            amarriott_password))
+    print(ansible_command)
+    if ansible_command[0] is False:
+        print("The ansible scripts could not run correctly, ending bulid")
+        exit(1)
 
     print("Running connectivity testing and service testing")
     for file in ["connectivity_check.py --ips 192.168.13.10,192.168.11.10",

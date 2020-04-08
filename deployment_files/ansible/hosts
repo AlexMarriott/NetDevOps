@@ -17,7 +17,7 @@ ansible_become_password=Cisco
 
 #Cloud Instances
 [cloud]
-OfficeVm1 ansible_host=192.168.12.1
+OfficeVm1 ansible_host=192.168.11.10
 OfficeVm2 ansible_host=192.168.12.10
 OfficeVm3 ansible_host=192.168.13.10
 

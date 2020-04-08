@@ -14,6 +14,3 @@ sudo -u amarriott  chmod 744 /home/amarriott/.ssh/sshkey*  && sudo -u amarriott 
 
 sudo -u amarriott  ssh-agent bash
 sudo -u amarriott  ssh-add ~/.ssh/sshkey
-
-mkdir group_vars
-mv all.yaml group_vars/
