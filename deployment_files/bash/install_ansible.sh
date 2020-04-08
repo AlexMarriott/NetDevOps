@@ -14,3 +14,4 @@ sudo -u amarriott  chmod 744 /home/amarriott/.ssh/sshkey*  && sudo -u amarriott 
 
 sudo -u amarriott  ssh-agent bash
 sudo -u amarriott  ssh-add ~/.ssh/sshkey
+exit(0)

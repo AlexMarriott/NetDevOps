@@ -11,6 +11,11 @@ from BuildBin.azure.azure_api import AzureApi
 from BuildBin.common import build_path
 
 build_type = sys.argv[1]
+try:
+    delete_nodes = sys.argv[2]
+except IndexError as e:
+    delete_nodes = False
+
 gns3_server = "192.168.137.129"
 gns3_port = "3080"
 amarriott_password = "iKcc-KfeZR.!EEAZUZQi#Bed"
@@ -37,11 +42,13 @@ if build_type.upper() == 'LAN':
         exit(1)
 
     print("Running base test case")
-    base_test = "'script={0} ips=192.168.12.1,192.168.12.2,192.168.12.3'".format(build_path("deployment_files","testcases", "connectivity_check.py"))
+    base_test = "'script={0} ips=192.168.12.1,192.168.12.2,192.168.12.3'".format(
+        build_path("deployment_files", "testcases", "connectivity_check.py"))
 
-    base = ansible.run_script("deploy_file", script_path=build_path("deployment_files", "ansible", "ansible_lan"), parameters=base_test)
+    base = ansible.run_script("deploy_file", script_path=build_path("deployment_files", "ansible", "ansible_lan"),
+                              parameters=base_test)
     if not base:
-        #Should put a exit handle function here.
+        # Should put a exit handle function here.
         print("Something went wrong")
         exit(1)
 
@@ -50,11 +57,11 @@ if build_type.upper() == 'LAN':
 
 elif build_type.upper() == 'CLOUD':
 
-
     print("Uploading commonly used files to azure storage")
     azure_api = AzureApi()
     upload_files = [{"file_name": "install_ansible.sh", "file_path": build_path("deployment_files", "bash")},
-                    {"file_name": "deploy_services.yaml", "file_path": build_path("deployment_files", "ansible", "ansible_cloud")},
+                    {"file_name": "deploy_services.yaml",
+                     "file_path": build_path("deployment_files", "ansible", "ansible_cloud")},
                     {"file_name": "ansible.cfg", "file_path": build_path("deployment_files", "ansible")},
                     {"file_name": "hosts", "file_path": build_path("deployment_files", "ansible")},
                     {"file_name": "service_checker.py", "file_path": build_path("deployment_files", "testcases")},
@@ -133,11 +140,15 @@ elif build_type.upper() == 'CLOUD':
 
     ssh.client.close()
 
-    print("deleting the azure nodes")
-    for vm in azure_nodes:
-        status = azure_api.delete_node(vm)
-        print(status)
-        if status == "succeeded":
-            print("{0} deleted".format(vm['name']))
-        else:
-            print("Something went wrong when deleting the node.")
+    if not delete_nodes:
+        print("Bulid completed, not deleting azure nodes")
+    else:
+        print("deleting the azure nodes")
+        #    if delete_nodes
+        for vm in azure_nodes:
+            status = azure_api.delete_node(vm)
+            print(status)
+            if status == "succeeded":
+                print("{0} deleted".format(vm['name']))
+            else:
+                print("Something went wrong when deleting the node.")
