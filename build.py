@@ -54,7 +54,7 @@ elif build_type.upper() == 'CLOUD':
     azure_api = AzureApi()
     upload_files = [{"file_name": "install_ansible.sh", "file_path": build_path("deployment_files", "bash")},
                     {"file_name": "deploy_services.yaml", "file_path": build_path("deployment_files", "ansible", "ansible_cloud")},
-                    {"file_name": "cloud.yaml", "file_path": build_path("deployment_files", "ansible", "ansible_cloud", "group_vars")},
+                    {"file_name": "cloud.yaml", "file_path": build_path("deployment_files", "ansible", "group_vars")},
                     {"file_name": "ansible.cfg", "file_path": build_path("deployment_files", "ansible")},
                     {"file_name": "hosts", "file_path": build_path("deployment_files", "ansible")},
                     {"file_name": "service_checker.py", "file_path": build_path("deployment_files", "testcases")},
@@ -140,4 +140,4 @@ elif build_type.upper() == 'CLOUD':
         if status == "succeeded":
             print("{0} deleted".format(vm['name']))
         else:
-            print("Something went wrong when deleting the node. ")
+            print("Something went wrong when deleting the node.")
