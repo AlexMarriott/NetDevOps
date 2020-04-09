@@ -12,13 +12,10 @@
   tasks:
     - debug:
           msg: "{{ script_param }} --ips {{ ips_param }} --services {{ services_param }}"
-    - name: Running the base testcases for the network
-      script: "{{ script_param }} --ips {{ ips_param }} --services {{ services_param }}"
-      args:
-          executable: python3
+    #- name: Running the base testcases for the network
+    #  script: "{{ script_param }} --ips {{ ips_param }} --services {{ services_param }}"
+    #  args:
+    #      executable: python3
 
     #- debug:
     #    msg: "{{ script_param }} --ips {{ ips_param }}"
-
-
-
