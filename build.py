@@ -53,7 +53,7 @@ if build_type.upper() == 'LAN':
     connectivity_run = ansible.run_script("deploy_file", script_path=build_path("deployment_files", "ansible", "ansible_lan"),
                                   parameters=connectivity_check)
     service_run = ansible.run_script("deploy_service_test", script_path=build_path("deployment_files", "ansible", "ansible_lan"),
-                                  parameters=connectivity_check)
+                                  parameters=service_check)
     if not connectivity_run:
          # Should put a exit handle function here.
         print("Something went wrong")
