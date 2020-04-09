@@ -9,10 +9,11 @@ class BuildAnsible():
         if parameters is not None:
             new_parameters = os.path.abspath("{0}/{1}.yaml --extra-vars {2}".format(script_path, script_name, parameters))
         else:
-            new_parameters =  os.path.abspath("{0}/{1}.yaml".format(script_path, script_name))
+            new_parameters = os.path.abspath("{0}/{1}.yaml".format(script_path, script_name))
 
         print("Running ansible script: {0}".format(script_name))
         try:
+            print("ansible-playbook -i {0} {1} -vvvv".format(self.host_file, new_parameters))
             os.system("ansible-playbook -i {0} {1} -vvvv".format(self.host_file, new_parameters))
             return True
         except Exception as e:
