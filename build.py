@@ -45,15 +45,17 @@ if build_type.upper() == 'LAN':
         exit(1)
 
     print("Running base test case")
-    base_test = "'script={0} ips=192.168.12.1,192.168.12.2,192.168.12.3'".format(
-        build_path("deployment_files", "testcases", "connectivity_check.py"))
+    for parameter in ["'script={0} ips=192.168.12.1,192.168.12.2,192.168.12.3'".format(
+        build_path("deployment_files", "testcases", "connectivity_check.py")),
+        "'script={0} ips=192.168.11.10,192.168.13.10 services=HTTP'".format("service_checker.py")]:
 
-    base = ansible.run_script("deploy_file", script_path=build_path("deployment_files", "ansible", "ansible_lan"),
-                              parameters=base_test)
-    if not base:
-        # Should put a exit handle function here.
-        print("Something went wrong")
-        exit(1)
+        print("Running {0}".format(parameter))
+        base = ansible.run_script("deploy_file", script_path=build_path("deployment_files", "ansible", "ansible_lan"),
+                                  parameters=parameter)
+        if not base:
+            # Should put a exit handle function here.
+            print("Something went wrong")
+            exit(1)
 
     print("Test ran, job completed. Have a nice day :-)")
 
