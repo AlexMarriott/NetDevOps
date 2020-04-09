@@ -1,5 +1,4 @@
 import os
-from .common import build_path
 
 class BuildAnsible():
     def __init__(self, host_file):
