@@ -45,17 +45,23 @@ if build_type.upper() == 'LAN':
         exit(1)
 
     print("Running base test case")
-    for parameter in ["'script={0} ips=192.168.12.1,192.168.12.2,192.168.12.3'".format(
-        build_path("deployment_files", "testcases", "connectivity_check.py")),
-        "'script={0} ips=192.168.11.10,192.168.13.10 services=HTTP'".format(build_path("deployment_files", "testcases","service_checker.py"))]:
+    connectivity_check = "'script={0} ips=192.168.12.1,192.168.12.2,192.168.12.3'".format(
+        build_path("deployment_files", "testcases", "connectivity_check.py"))
+    service_check = "'script={0} ips=192.168.11.10,192.168.13.10 services=HTTP'".format(build_path("deployment_files", "testcases","service_checker.py"))
 
-        print("Running {0}".format(parameter))
-        base = ansible.run_script("deploy_file", script_path=build_path("deployment_files", "ansible", "ansible_lan"),
-                                  parameters=parameter)
-        if not base:
-            # Should put a exit handle function here.
-            print("Something went wrong")
-            exit(1)
+    print("Running {0}".format(connectivity_check))
+    connectivity_run = ansible.run_script("deploy_file", script_path=build_path("deployment_files", "ansible", "ansible_lan"),
+                                  parameters=connectivity_check)
+    service_run = ansible.run_script("deploy_service_test", script_path=build_path("deployment_files", "ansible", "ansible_lan"),
+                                  parameters=connectivity_check)
+    if not connectivity_run:
+         # Should put a exit handle function here.
+        print("Something went wrong")
+        exit(1)
+    elif not service_run:
+        # Should put a exit handle function here.
+        print("Something went wrong")
+        exit(1)
 
     print("Test ran, job completed. Have a nice day :-)")
 
