@@ -1,6 +1,9 @@
-#Ansible server: 192.168.1.131
-#Need to pre-config the switches
+DOCUMENTATION = '''
 ---
+module: mini-lan-ssh
+short_description: This module configures simple banners on the three routers within the physical network on GNS3
+
+'''
 - name: configurating the cisco devices
   hosts: R1
   gather_facts: no

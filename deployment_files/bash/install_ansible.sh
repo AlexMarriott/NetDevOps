@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+
+# A bash script for configuring and setting up the remote ansible node in auzre
+# Alex Marriott - 24/4/2020
+
 apt update && apt upgrade -y && apt install ansible sshpass python3 python3-pip -y
 
 rm -rf /home/amarriott/.ssh/known_hosts

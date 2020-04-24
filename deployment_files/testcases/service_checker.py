@@ -5,7 +5,19 @@ from ftplib import FTP
 import argparse
 import requests
 
+"""
+This Class is the uses the paramiko library to connect to devices during the build process
+and run commands on the remote system.
+"""
+
 def webserver_check(i):
+    """
+            The init function takes the necessary parameters to instantiate an instance of SSHclient
+            :param hostname:
+            :param username: String, username used for remote authentication
+            :param password: String, used for authenticating with the remote device
+            :param port: int, port number for the remote ssh port
+            """
     resp = requests.get("http://{0}".format(i))
     if 200 >= resp.status_code <= 204 and resp.reason == "OK":
         print("Can connect to {0} via HTTP".format(i))
@@ -16,6 +28,13 @@ def webserver_check(i):
         return False
 
 def ftp_check(i):
+    """
+            The init function takes the necessary parameters to instantiate an instance of SSHclient
+            :param hostname:
+            :param username: String, username used for remote authentication
+            :param password: String, used for authenticating with the remote device
+            :param port: int, port number for the remote ssh port
+            """
     ftp = FTP(i)
     check = ftp.login(user="ftpuser", passwd="ftpuser")
 

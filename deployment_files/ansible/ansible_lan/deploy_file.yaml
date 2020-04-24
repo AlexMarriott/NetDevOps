@@ -1,6 +1,9 @@
-#Ansible server: 192.168.1.131
-#Need to pre-config the switches
+DOCUMENTATION = '''
 ---
+module: deploy_file
+short_description: This module deploys the remote testing scripts for the python network tests within the GNS3 instance
+
+'''
 - name: Deploying connectivity script to
   hosts: deployerserver
   gather_facts: no

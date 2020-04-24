@@ -5,6 +5,7 @@ from azure.mgmt.network import NetworkManagementClient
 from azure.mgmt.resource import ResourceManagementClient
 from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient
 from msrestazure.azure_exceptions import CloudError
+
 import requests
 import random
 import os

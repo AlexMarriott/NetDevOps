@@ -1,7 +1,10 @@
-#Ansible server: 192.168.1.131
-#Need to pre-config the switches
+DOCUMENTATION = '''
 ---
-- name: Installing apache and FTP on Office 1 and Office 3 VM's
+module: deploy_servies
+short_description: This module deploys the services for the VMs within the azure network so service testing can take place.
+'''
+---
+- name: Installing apache and FTP on Office 1 and Office 3 VMs
   hosts: OfficeVm1:OfficeVm3 
   become: yes
   gather_facts: yes
@@ -78,7 +81,7 @@
   - name: Adding a FTP user
     user:
       name: ftpuser
-      password: "{{ password | password_hash('sha512') }}"
+      password: "{{ password | password_hash("sha512") }}"
       home: /var/ftp/public
 
   - name: Changing the file permissions for the ftp dir
@@ -86,7 +89,7 @@
       path: /var/ftp/public
       owner: ftpuser
       group: ftpuser
-      mode: '0744'
+      mode: "0744"
 
   - name: Restarting the ansible service
     service:

@@ -10,6 +10,11 @@ from BuildBin.azure.models import AzureNode
 from BuildBin.azure.azure_api import AzureApi
 from BuildBin.common import build_path
 
+"""
+    This script is the main build file for the network build system.
+    It has two parts, the physical GNS3 simulation network and the cloud network.
+"""
+
 build_type = sys.argv[1]
 try:
     delete_nodes = sys.argv[2]
@@ -18,7 +23,9 @@ except IndexError as e:
 
 gns3_server = "192.168.137.129"
 gns3_port = "3080"
-amarriott_password = "iKcc-KfeZR.!EEAZUZQi#Bed"
+
+#Used as a stub password, during a build process, the password will be saved within the running build job.
+amarriott_password = "iKcc-KfeZR.!EEAZUZQi#Bed" # os.environ['gns_password]
 
 print("Starting Build process")
 
@@ -28,13 +35,25 @@ if build_type.upper() == 'LAN':
     print("Running Lan network deployment")
     print("Opening GNS3 Lab and powering on nodes")
 
+    #Start the GNS3 server
     g = GNS3(gns3_server, gns3_port, "basenetwork1")
     id = g.find_project_id()
-    print(g.open_project(id))
-    print(g.start_nodes(id))
+    if id == 404:
+        print("Could not find the gns project id, ending build.")
+        exit(0)
+    open_project = g.open_project(id)
+    if open_project == 404:
+        print("Could not open gns3 project, ending build.")
+        exit(0)
+
+    state_nodes = g.start_nodes(id)
+    if state_nodes == 404:
+        print("Could not start network nodes, ending build")
+        exit(0)
 
     print("waiting 30 seconds for the cisco routers to start up")
     time.sleep(30)
+    #create an ansible object for the configuration.
     ansible = BuildAnsible(build_path("deployment_files", "ansible", "hosts"))
 
     print("Running the deployment scripts")
@@ -45,6 +64,7 @@ if build_type.upper() == 'LAN':
         exit(1)
 
     print("Running base test case")
+    #The python testing file to check network connectivity.
     connectivity_check = "'script={0} ips=192.168.12.1,192.168.12.2,192.168.12.3'".format(
         build_path("deployment_files", "testcases", "connectivity_check.py"))
     service_check = "'script={0} ips=192.168.11.10,192.168.13.10 services=HTTP'".format(build_path("deployment_files", "testcases","service_checker.py"))
@@ -69,6 +89,7 @@ if build_type.upper() == 'LAN':
 elif build_type.upper() == 'CLOUD':
 
     print("Uploading commonly used files to azure storage")
+    #Making sure all the deployment files are uploaded to the azure instance.
     azure_api = AzureApi()
     upload_files = [{"file_name": "install_ansible.sh", "file_path": build_path("deployment_files", "bash")},
                     {"file_name": "deploy_services.yaml",
@@ -100,6 +121,7 @@ elif build_type.upper() == 'CLOUD':
                                      disk_name=node['disk_name']))
 
     print("Cloud nodes deployed, moving on the base deployment")
+    #Connecting to the remote instance using python to upload and deploy the scripts within the azure instance
     ssh = RemoteSSH(hostname='51.140.73.210', username="amarriott", password=amarriott_password, port=22)
     ssh.connect()
 
@@ -122,7 +144,7 @@ elif build_type.upper() == 'CLOUD':
     print("Creating deployment folder")
     ssh.exec_command("mkdir -p deployment")
     ssh.exec_command("rm deployment/*")
-
+    #Making sure the files which have been written on windows can run on linux.
     print("Installing any dos2unix the deployment files ")
     print(ssh.exec_command("echo {0} | sudo apt install dos2unix -y"))
 
@@ -136,6 +158,7 @@ elif build_type.upper() == 'CLOUD':
     print(ssh.exec_command("(cd deployment; echo {0} | sudo ./install_ansible.sh)".format(amarriott_password)))
     print("waiting 30 seconds for the linux vm's to start up")
     time.sleep(30)
+
     print("Running ansible playbook")
     ansible_command = ssh.exec_command(
         "echo {0} | sudo chmod 777 sshkey.pub sshkey; echo {0} | sudo -s; cd deployment; ansible-playbook -i hosts deploy_services.yaml".format(

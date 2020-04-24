@@ -1,5 +1,11 @@
-#Ansible server: 192.168.1.131
-#Need to pre-config the switches
+#!/usr/bin/python
+DOCUMENTATION = '''
+---
+module: deploy_service_test
+short_description: This module deploys the remote testing scripts for the python network tests
+
+'''
+
 ---
 - name: Deploying service testing script
   hosts: deployerserver
@@ -14,6 +20,3 @@
       script: "{{ script_param }} --ips {{ ips_param }} --services {{ services_param }}"
       args:
           executable: python3
-
-    #- debug:
-    #    msg: "{{ script_param }} --ips {{ ips_param }}"
