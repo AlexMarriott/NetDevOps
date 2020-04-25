@@ -5,16 +5,12 @@ import subprocess
 import argparse
 
 """
-This Class is the uses the paramiko library to connect to devices during the build process
-and run commands on the remote system.
+This file pings network devices and is used during the testing stage of the network CI/CD pipeline.
 """
 def ping_ip(ip):
     """
-    The init function takes the necessary parameters to instantiate an instance of SSHclient
-    :param hostname:
-    :param username: String, username used for remote authentication
-    :param password: String, used for authenticating with the remote device
-    :param port: int, port number for the remote ssh port
+    The ping_ip script takes in a ip address and ping the ip.
+    :param ip: Ip address of the device you want to ping
     """
     #TODO add messuring of the packets.
     param = '-n' if platform.system().lower() == 'windows' else '-c'

@@ -18,8 +18,14 @@ def parameterise_values(parameters):
 
 
 class AzureApi():
-
+    """
+    The AzureAPI class is a class which holds all of the API calls which the CI/CD network pipeline will call during the cloud deployment.
+    """
     def __init__(self):
+        """
+        The init function sets all the necessary parameters used to interact with and authenticate with azure.
+        :param self:
+        """
         self.credentials = get_credentials()
         self.subscription = get_subscription()
         self.resource_group = "TestNetwork"
@@ -34,15 +40,17 @@ class AzureApi():
         self.rg_template = self.get_templates(os.path.abspath("BuildBin/azure/templates/create_rg.json"))
 
     def file_upload(self, file_name, local_path):
+        """
+        The file_uploadfunction is used to upload files to the blob storage location in azure for the network automation deployments.
+        :param file_name: String, The name of the file to be uploaded
+        :param local_path: String, The location of the file to be uploaded.
+        :return upload information, String
+        """
         # Used for uploading the deployment files to azure blob storage
-
         # Create a file in local data directory to upload and download
-
-
         upload_file_path = os.path.join(local_path, file_name)
 
         # Create a blob client using the local file name as the name for the blob
-
         blob_client = self.blob_client.get_blob_client(container="deploymentscripts", blob=file_name)
 
 
@@ -55,6 +63,14 @@ class AzureApi():
         return blob_client.get_blob_properties()
 
     def create_node(self, vmname="R1TestNode", nic_name=None, subnet=None, ip_assignment_type=None, ip_address=None):
+        """
+        The create_node function is used to create azure VM within the testnetwork network.
+        :param vmname: String, The name of the VM to be created
+        :param nic_name: String, The name of the network card to be created and assigned to the VM
+        :param subnet: String, The name of the subnet for the vm to be assigned to.
+        :param ip_assignment_type: String, The ip assignment type, can either be static or dynamic
+        :param ip_address: String, The ip address for the network card.
+        """
         if nic_name is None:
             nic_name = vmname + str(random.randint(1, 100) * 5)
         if subnet is None:
@@ -106,6 +122,11 @@ class AzureApi():
                 "disk_name": disk_name}
 
     def get_node(self, vmname, expand=""):
+        """
+        Gets the azure VM details.
+        :param vmname: String, The name of the VM to be retrieved.
+        :param expand: String, additional string which can be passed into the api call to return more information regarding an element of the VM
+        """
         return self.compute_client.virtual_machines.get(self.resource_group, vmname,
                                                         paramaters={"$expand={0}".format(expand)})
 
