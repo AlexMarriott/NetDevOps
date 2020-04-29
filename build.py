@@ -1,6 +1,4 @@
-import os
 import sys
-import paramiko
 import time
 
 from BuildBin.build_ansible import BuildAnsible
@@ -11,10 +9,9 @@ from BuildBin.azure.azure_api import AzureApi
 from BuildBin.common import build_path
 
 """
-    This script is the main build file for the network build system.
-    It has two parts, the physical GNS3 simulation network and the cloud network.
+This script is the main build file for the network build system.
+It has two parts, the physical GNS3 simulation network and the cloud network.
 """
-
 build_type = sys.argv[1]
 try:
     delete_nodes = sys.argv[2]

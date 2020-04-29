@@ -12,6 +12,7 @@ This file check two services, HTTP and FTP and is used during the testing stage 
 def webserver_check(ip):
     """
     The webserver_check checks to see if a webserver on the given ip address is running via checking the status code and respone-reson
+    :param ip: the ip address to check the web service of.
     :return: True if the service is running or False if the service isn't running or cannot be reached
     """
     resp = requests.get("http://{0}".format(ip))
@@ -26,6 +27,7 @@ def webserver_check(ip):
 def ftp_check(ip):
     """
     The ftp_service checks to see if a FTP server on the given ip address is running via checking the status code and respone-reson
+    :param ip: the ip address to check the FTP service of.
     :return: True if the service is running or False if the service isn't running or cannot be reached
     """
     ftp = FTP(ip)

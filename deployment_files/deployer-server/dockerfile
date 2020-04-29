@@ -1,4 +1,4 @@
-
+# This file is used for creating a deployer server within the GNS3 instance to run the testing scripts.
 
 FROM ubuntu:18.04
 RUN apt-get update && apt-get install -y openssh-server && apt install -y python3.7 && mkdir /var/run/sshd && echo "root:ansible" | chpasswd \

@@ -41,7 +41,7 @@ class AzureApi():
 
     def file_upload(self, file_name, local_path):
         """
-        The file_uploadfunction is used to upload files to the blob storage location in azure for the network automation deployments.
+        The file_upload function is used to upload files to the blob storage location in azure for the network automation deployments.
         :param file_name: String, The name of the file to be uploaded
         :param local_path: String, The location of the file to be uploaded.
         :return upload information, String
@@ -131,6 +131,11 @@ class AzureApi():
                                                         paramaters={"$expand={0}".format(expand)})
 
     def delete_node(self, node):
+        """
+        This functions deletes the Azure VM
+        :param vmname: String, The name of the VM to be deleted.
+        :returns: status of the deleted node or a 404 if the operation did not succeed
+        """
         try:
             print("deleting resource group :{0}".format(node.name))
             async_delete = self.compute_client.virtual_machines.delete(self.resource_group, node.name)
@@ -156,6 +161,11 @@ class AzureApi():
         return 404
 
     def get_templates(self, template):
+        """
+        Gets the json template for the Azure VM intended to be created
+        :param template: String, The file path of the json template
+        :returns: status of the deleted node or a 404 if the operation did not succeed
+        """
         with open(template, 'r') as template_file_fd:
             return json.load(template_file_fd)
 
@@ -166,6 +176,17 @@ class AzureApi():
                              subnet="Office1",
                              ip_assignment_type="Dynamic",
                              ip_address=""):
+        """
+        Takes in parameters to build a json template for the network card creation in azure
+        :param resource_group: String, The name of the resource_group the network will be attached to.
+        :param network_interface_name: String, Network card name
+        :param location: String, Azure datacenter location.
+        :param subnet: String, Subnet the network card will be attached to.
+        :param ip_assignment_type: String, IP assignment type, either static or dynamic for a DHCP address.
+        :param ip_address: String, IP address for the static assignment type.
+        :returns: prepared json template for use within the deployment pipeline.
+        """
+
         return {
             "location": "{0}".format(location),
             "type": "Microsoft.Network/networkInterfaces",
@@ -190,6 +211,13 @@ class AzureApi():
         }
 
     def prepare_vm_template(self, resource_group, nic_name, vmname='test_vm_' + str(random.randint(1, 10) * 5)):
+        """
+        Takes in parameters to build a json template for the vm creation in azure
+        :param resource_group: String, The name of the resource_group the network will be attached to.
+        :param nic_name: String, Network card name
+        :param vmname: String, Azure VM
+        :returns: prepared json template for use within the deployment pipeline.
+        """
         # Nic must have a value.
         if nic_name is None or "":
             return False
