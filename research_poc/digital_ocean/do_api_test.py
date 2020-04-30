@@ -1,5 +1,5 @@
 import unittest
-from research_poc.do_api import DoApi
+from research_poc.digital_ocean.do_api import DoApi
 
 
 class Do_Api_Test(unittest.TestCase):
