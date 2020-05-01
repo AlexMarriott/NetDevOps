@@ -6,7 +6,7 @@ class RemoteSSH:
 
     """
     This Class is the uses the paramiko library to connect to devices during the build process
-    and run commands on the remote system.
+    and run commands on the remote system..
     """
 
     def __init__(self, hostname, username, password, port=22):
