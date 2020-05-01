@@ -18,7 +18,7 @@ try:
 except IndexError as e:
     delete_nodes = False
 
-gns3_server = "192.168.137.129"
+gns3_server = "192.168.1.129"
 gns3_port = "3080"
 
 #Used as a stub password, during a build process, the password will be saved within the running build job.
@@ -54,7 +54,7 @@ if build_type.upper() == 'LAN':
     ansible = BuildAnsible(build_path("deployment_files", "ansible", "hosts"))
 
     print("Running the deployment scripts")
-
+    #Configuring the GNS3 lab routers using ansible.
     deploy = ansible.run_script("mini-lan-ssh", script_path=build_path("deployment_files", "ansible", "ansible_lan"))
     if not deploy:
         print("Something went wrong")
