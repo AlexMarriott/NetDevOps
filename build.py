@@ -55,7 +55,8 @@ if build_type.upper() == 'LAN':
 
     print("Running the deployment scripts")
     #Configuring the GNS3 lab routers using ansible.
-    deploy = ansible.run_script("mini-lan-ssh", script_path=build_path("deployment_files", "ansible", "ansible_lan"))
+    deploy = ansible.run_script("mini-lan-ssh",
+                                script_path=build_path("deployment_files", "ansible", "ansible_lan"))
     if not deploy:
         print("Something went wrong")
         exit(1)
