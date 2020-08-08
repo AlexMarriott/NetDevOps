@@ -1,0 +1,25 @@
+{
+  "location": "uksouth",
+  "resources": [
+    {
+      "type": "Microsoft.Network/networkInterfaces",
+      "name": "[parameters('networkInterfaceName')]",
+      "location": "uksouth",
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "privateIpAddressVersion": "IPv4",
+              "privateIPAllocationMethod": "[parameters('privateIPAllocationMethod')]",
+              "privateIPAddress": "[parameters('networkInterfaceName')]",
+              "subnet": {
+                "id": "/subscriptions/8da87477-14ec-488c-a181-1dbdcc25525e/resourceGroups/TestNetwork/providers/Microsoft.Network/virtualNetworks/TestNetwork/subnets/"
+              }
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

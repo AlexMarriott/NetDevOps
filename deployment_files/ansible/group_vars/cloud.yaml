@@ -1,0 +1,4 @@
+ansible_user: amarriott
+ansible_password: Movingonup2016
+ansible_become: yes
+ansible_become_password: Movingonup2016

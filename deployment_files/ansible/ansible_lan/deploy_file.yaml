@@ -1,0 +1,24 @@
+DOCUMENTATION = '''
+---
+module: deploy_file
+short_description: This module deploys the remote testing scripts for the python network tests within the GNS3 instance
+
+'''
+- name: Deploying connectivity script to
+  hosts: deployerserver
+  gather_facts: no
+  connection: local
+  vars:
+    ips_param: "{{ ips }}"
+    script_param: "{{ script }}"
+  tasks:
+    - name: Running the base testcases for the network
+      script: "{{ script_param }} --ips {{ ips_param }}"
+      args:
+          executable: python3
+
+    #- debug:
+    #    msg: "{{ script_param }} --ips {{ ips_param }}"
+
+
+

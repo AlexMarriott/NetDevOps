@@ -1,0 +1,22 @@
+#!/usr/bin/python
+DOCUMENTATION = '''
+---
+module: deploy_service_test
+short_description: This module deploys the remote testing scripts for the python network tests
+
+'''
+
+---
+- name: Deploying service testing script
+  hosts: deployerserver
+  gather_facts: no
+  connection: local
+  vars:
+    ips_param: "{{ ips }}"
+    script_param: "{{ script }}"
+    services_param: "{{ services }}"
+  tasks:
+    - name: Running the base testcases for the network
+      script: "{{ script_param }} --ips {{ ips_param }} --services {{ services_param }}"
+      args:
+          executable: python3
